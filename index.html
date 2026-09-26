@@ -1,0 +1,2881 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#1a3c5e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=(), usb=()">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
+  style-src 'self' 'unsafe-inline' data:;
+  font-src 'self' data:;
+  img-src 'self' data: blob:;
+  connect-src 'self' data: blob: https:;
+  object-src 'none';
+  base-uri 'self';
+  form-action 'none';
+">
+
+<title>ARTDENT — سیستم حسابداری لابراتوار دندانسازی</title>
+
+<style>
+:root {
+  --brand: #1a3c5e; --brand-light: #2c5c8a; --brand-dark: #0f2740;
+  --accent: #e67e22; --paid: #c8f7c5; --unpaid: #f7c5c5; --hidden: #d9d9d9;
+  --bg: #f4f6f9; --card-bg: #ffffff; --text: #222; --text-muted: #888;
+  --border: #c3c9d1; --shadow: 0 2px 10px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.15);
+  --radius: 10px; --radius-sm: 6px;
+}
+body.theme-spring { --brand:#27ae60; --brand-light:#2ecc71; --brand-dark:#1e8449; --accent:#f39c12; --bg:#f0f9f4; }
+body.theme-summer { --brand:#0984e3; --brand-light:#74b9ff; --brand-dark:#0652dd; --accent:#fdcb6e; --bg:#f0f7ff; }
+body.theme-autumn { --brand:#d35400; --brand-light:#e67e22; --brand-dark:#a04000; --accent:#f39c12; --bg:#fdf6ef; }
+body.theme-winter { --brand:#2c3e50; --brand-light:#34495e; --brand-dark:#1a252f; --accent:#c0392b; --bg:#eef2f7; }
+body.theme-ramadan { --brand:#6c5ce7; --brand-light:#a29bfe; --brand-dark:#4834d4; --accent:#fdcb6e; --bg:#f5f3ff; }
+body.theme-nowruz { --brand:#00b894; --brand-light:#55efc4; --brand-dark:#00897b; --accent:#fdcb6e; --bg:#f0fff4; }
+body.theme-yalda { --brand:#8e44ad; --brand-light:#9b59b6; --brand-dark:#6c3483; --accent:#e74c3c; --bg:#faf5ff; }
+body.theme-dark { --brand:#4a90d9; --brand-light:#6ba3e0; --brand-dark:#2c5c8a; --accent:#f39c12; --bg:#1a1d23; --card-bg:#252a33; --text:#e8eaed; --text-muted:#9aa0a6; --border:#3a4048; }
+
+* { box-sizing: border-box; font-family: "Vazirmatn", "B Nazanin", Tahoma, sans-serif; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.7; min-height: 100vh; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+
+.progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: transparent; z-index: 3000; pointer-events: none; }
+.progress-bar.active::before { content: ''; display: block; height: 100%; background: linear-gradient(90deg, var(--brand), var(--brand-light), var(--brand)); background-size: 200% 100%; animation: progress 1.5s linear infinite; }
+@keyframes progress { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+
+.security-shield { position: fixed; bottom: 16px; left: 16px; z-index: 9999; background: rgba(26,60,94,0.95); color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: var(--shadow-lg); user-select: none; }
+.security-shield:hover { background: var(--brand); }
+.security-shield.alert { background: #c0392b; }
+.security-shield.warning { background: #e67e22; }
+
+.topbar { background: var(--brand); color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 8px; }
+.topbar .brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: bold; min-width: 0; }
+.topbar .brand img { width: 34px; height: 34px; border-radius: 50%; background: white; padding: 2px; flex-shrink: 0; }
+.topbar .brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar .user-info { font-size: 12px; opacity: 0.9; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.topbar .sync-indicator { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.15); padding: 3px 10px; border-radius: 20px; font-size: 11px; }
+.topbar .sync-indicator .dot { width: 8px; height: 8px; border-radius: 50%; background: #27ae60; }
+.topbar .online-status { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(39,174,96,0.3); }
+.topbar .online-status.offline { background: rgba(192,57,43,0.4); }
+.topbar .lock-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 14px; padding: 4px 10px; border-radius: 20px; cursor: pointer; }
+.topbar .lock-btn:hover { background: rgba(255,255,255,0.3); }
+
+.mobile-menu-btn { display: none; background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0 8px; }
+.menubar { background: var(--brand-light); display: flex; flex-wrap: wrap; padding: 0 12px; gap: 2px; box-shadow: var(--shadow); position: sticky; top: 54px; z-index: 99; overflow-x: auto; }
+.menu-item { position: relative; color: white; padding: 11px 15px; cursor: pointer; font-size: 13px; user-select: none; white-space: nowrap; }
+.menu-item:hover { background: var(--brand-dark); }
+.menu-dropdown { position: absolute; top: 100%; right: 0; background: var(--card-bg); color: var(--text); min-width: 260px; box-shadow: var(--shadow-lg); border-radius: 0 0 var(--radius-sm) var(--radius-sm); display: none; z-index: 101; overflow: hidden; }
+.menu-item:hover .menu-dropdown, .menu-item.open .menu-dropdown { display: block; }
+.menu-dropdown a { display: block; padding: 10px 18px; color: var(--text); text-decoration: none; font-size: 13px; border-bottom: 1px solid var(--border); }
+.menu-dropdown a:hover { background: var(--brand-light); color: white; }
+.menu-dropdown hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+.menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; }
+.menu-overlay.active { display: block; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 16px; }
+.page-title { text-align: center; color: var(--brand); font-size: 20px; font-weight: bold; margin-bottom: 18px; padding: 0 8px; }
+.card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+.card-title { color: var(--brand); font-weight: bold; font-size: 15px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--brand-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.badge { background: var(--brand-light); color: white; font-size: 11px; padding: 3px 10px; border-radius: 12px; }
+
+.lock-screen { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: none; justify-content: center; align-items: center; padding: 16px; }
+.lock-screen.show { display: flex; }
+.lock-box { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 32px; max-width: 400px; width: 100%; text-align: center; }
+.lock-box h2 { color: var(--brand); margin-bottom: 16px; }
+.lock-box .lock-icon { font-size: 64px; margin-bottom: 16px; }
+
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 12.5px; color: var(--brand); font-weight: bold; }
+.form-group input, .form-group select, .form-group textarea { padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px; font-family: inherit; background: var(--card-bg); color: var(--text); width: 100%; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--brand-light); box-shadow: 0 0 0 3px rgba(44,92,138,0.15); }
+.form-group input[readonly] { background: rgba(0,0,0,0.03); cursor: not-allowed; }
+.password-strength { height: 4px; border-radius: 2px; margin-top: 4px; background: #ddd; overflow: hidden; }
+.password-strength .bar { height: 100%; transition: width 0.3s, background 0.3s; width: 0; }
+.password-strength .bar.weak { width: 33%; background: #c0392b; }
+.password-strength .bar.medium { width: 66%; background: #e67e22; }
+.password-strength .bar.strong { width: 100%; background: #27ae60; }
+
+.btn { background: var(--brand); color: white; border: none; padding: 9px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: bold; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; user-select: none; min-height: 38px; }
+.btn:hover { background: var(--brand-light); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { background: #a0a8b0; cursor: not-allowed; }
+.btn-secondary { background: #6c757d; } .btn-secondary:hover { background: #5a6268; }
+.btn-danger { background: #c0392b; } .btn-danger:hover { background: #a93226; }
+.btn-success { background: #27ae60; } .btn-success:hover { background: #229954; }
+.btn-warning { background: #e67e22; } .btn-warning:hover { background: #ca6f1e; }
+.btn-sm { padding: 6px 11px; font-size: 12px; min-height: 30px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+.table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 900px; }
+table.data-table thead th { background: var(--brand); color: white; padding: 10px 8px; text-align: center; font-weight: bold; position: sticky; top: 0; white-space: nowrap; }
+table.data-table tbody td { padding: 8px; text-align: center; border-bottom: 1px solid var(--border); }
+table.data-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+table.data-table tbody tr:hover { background: rgba(44,92,138,0.08); }
+table.data-table tbody tr.selected { background: rgba(44,92,138,0.2) !important; }
+table.data-table tbody tr.row-paid { background: var(--paid); }
+table.data-table tbody tr.row-unpaid { background: var(--unpaid); }
+table.data-table tbody tr.row-hidden { background: var(--hidden); opacity: 0.7; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 16px; overflow-y: auto; }
+.modal-overlay.active { display: flex; }
+.modal { background: var(--card-bg); color: var(--text); border-radius: var(--radius); box-shadow: var(--shadow-lg); max-width: 900px; width: 100%; max-height: 92vh; overflow: auto; display: flex; flex-direction: column; }
+.modal-lg { max-width: 1200px; } .modal-sm { max-width: 480px; }
+.modal-header { background: var(--brand); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-radius: var(--radius) var(--radius) 0 0; position: sticky; top: 0; z-index: 2; }
+.modal-header h3 { font-size: 15px; font-weight: bold; }
+.modal-close { background: transparent; border: none; color: white; font-size: 26px; cursor: pointer; line-height: 1; padding: 0 6px; }
+.modal-body { padding: 16px; flex: 1; overflow-y: auto; }
+.modal-footer { padding: 12px 16px; background: rgba(0,0,0,0.03); display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); flex-wrap: wrap; }
+
+.toast-container { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; max-width: calc(100% - 32px); }
+.toast { background: var(--card-bg); color: var(--text); border-right: 4px solid var(--brand); padding: 12px 18px; border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); min-width: 260px; font-size: 13px; pointer-events: auto; }
+.toast.success { border-color: #27ae60; } .toast.error { border-color: #c0392b; } .toast.warning { border-color: #e67e22; }
+
+.jalali-picker { position: absolute; background: var(--card-bg); color: var(--text); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 12px; z-index: 1500; width: 290px; max-width: calc(100vw - 20px); }
+.jalali-picker.hidden { display: none; }
+.jalali-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--brand); font-weight: bold; }
+.jalali-header button { background: var(--brand); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 15px; }
+.jalali-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+.jalali-grid .day-name { font-size: 11px; color: var(--text-muted); font-weight: bold; padding: 5px 0; }
+.jalali-grid .day { padding: 7px 0; border-radius: var(--radius-sm); cursor: pointer; font-size: 12.5px; }
+.jalali-grid .day:hover { background: rgba(44,92,138,0.15); }
+.jalali-grid .day.today { background: var(--brand-light); color: white; font-weight: bold; }
+.jalali-grid .day.selected { background: var(--brand); color: white; font-weight: bold; }
+
+.filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; padding: 12px; background: rgba(0,0,0,0.02); border-radius: var(--radius-sm); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.stat-card { background: var(--card-bg); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); border-right: 4px solid var(--brand); }
+.stat-card .label { font-size: 11.5px; color: var(--text-muted); margin-bottom: 4px; }
+.stat-card .value { font-size: 18px; font-weight: bold; color: var(--brand); }
+
+.query-builder { background: rgba(0,0,0,0.02); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; }
+.query-row { display: grid; grid-template-columns: 1fr 1fr 1.5fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
+.query-row select, .query-row input { padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; background: var(--card-bg); color: var(--text); }
+.query-row .remove-btn { background: #c0392b; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 16px; }
+
+.invoice-preview { background: white; color: #222; padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 800px; margin: 0 auto; font-size: 12px; }
+.invoice-preview .besmellah { text-align: center; color: #1a3c5e; font-weight: bold; margin-bottom: 12px; font-size: 14px; }
+.invoice-preview .header-box { display: flex; justify-content: space-between; border: 1px solid #1a3c5e; padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.invoice-preview table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.invoice-preview table th, .invoice-preview table td { border: 1px solid #9aa5b1; padding: 6px; text-align: center; font-size: 11px; }
+.invoice-preview table th { background: #1a3c5e; color: white; }
+.invoice-preview .total-box { background: #1a3c5e; color: white; padding: 14px; border-radius: var(--radius-sm); margin-top: 16px; text-align: center; }
+.invoice-preview .total-box .total-value { font-size: 22px; font-weight: bold; margin-top: 6px; }
+.invoice-preview .note { margin-top: 14px; font-size: 11px; color: #444; text-align: center; border-top: 1px dashed #ccc; padding-top: 10px; }
+
+.sec-row { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border); align-items: center; font-size: 13px; }
+.sec-row:last-child { border-bottom: none; }
+.sec-row .sec-icon { font-size: 18px; text-align: center; }
+.sec-row .sec-name { font-weight: bold; }
+.sec-row .sec-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.sec-row .sec-status { font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: bold; white-space: nowrap; }
+.sec-row .sec-status.ok { background: rgba(39,174,96,0.15); color: #27ae60; }
+.sec-row .sec-status.warn { background: rgba(230,126,34,0.15); color: #e67e22; }
+.sec-row .sec-status.fail { background: rgba(192,57,43,0.15); color: #c0392b; }
+.sec-row .sec-status.info { background: rgba(44,92,138,0.15); color: #2c5c8a; }
+.sec-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 12px; }
+.sec-section-header { background: rgba(44,92,138,0.08); padding: 10px 12px; font-weight: bold; color: var(--brand); font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+
+@media (max-width: 900px) {
+  .mobile-menu-btn { display: block; }
+  .menubar { display: none; position: fixed; top: 0; right: 0; bottom: 0; width: 280px; flex-direction: column; padding: 60px 0 20px; overflow-y: auto; box-shadow: -4px 0 20px rgba(0,0,0,0.2); z-index: 200; }
+  .menubar.mobile-open { display: flex; }
+  .menu-item { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .menu-dropdown { position: static; display: block; box-shadow: none; background: rgba(0,0,0,0.1); }
+  .menu-dropdown a { color: white; padding-right: 30px; }
+}
+@media (max-width: 700px) {
+  table.data-table { min-width: 100%; font-size: 12px; }
+  table.data-table thead { display: none; }
+  table.data-table tbody, table.data-table tr, table.data-table td { display: block; width: 100%; }
+  table.data-table tbody tr { background: var(--card-bg) !important; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; padding: 10px; box-shadow: var(--shadow); }
+  table.data-table tbody td { text-align: right; padding: 6px 4px; border: none; border-bottom: 1px dashed rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+  table.data-table tbody td:last-child { border-bottom: none; }
+  table.data-table tbody td::before { content: attr(data-label); font-weight: bold; color: var(--brand); font-size: 11px; margin-left: 8px; }
+  .query-row { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .query-row .remove-btn { grid-column: span 2; width: 100%; border-radius: var(--radius-sm); }
+}
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group input, .form-group select { font-size: 16px; }
+  .modal { max-width: 100%; max-height: 95vh; }
+  .modal-footer { flex-direction: column; }
+  .modal-footer .btn { width: 100%; justify-content: center; }
+  .filters { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .btn { font-size: 13px; padding: 9px 12px; min-height: 42px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .stat-card .value { font-size: 15px; }
+  .page-title { font-size: 16px; }
+  .filters { grid-template-columns: 1fr; }
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--brand-light); border-radius: 4px; }
+@media print { body { background: white; } .topbar, .menubar, .btn-row, .filters, .modal-footer, .security-shield { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="security-shield" id="securityShield" onclick="openSecurityCenter()" title="وضعیت امنیتی">
+  <span>🛡</span>
+  <span id="shieldStatus">بررسی...</span>
+</div>
+
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <h2>سیستم قفل است</h2>
+    <p style="color:var(--text-muted); margin-bottom:16px; font-size:13px;">برای ادامه، رمز عبور خود را وارد کنید</p>
+    <div class="form-group"><input type="password" id="unlockPassword" placeholder="رمز عبور"></div>
+    <div class="btn-row" style="justify-content:center;">
+      <button class="btn" onclick="tryUnlock()">🔓 باز کردن</button>
+      <button class="btn btn-secondary" onclick="logout()">خروج</button>
+    </div>
+    <p id="unlockError" style="color:#c0392b; font-size:12px; margin-top:10px;"></p>
+  </div>
+</div>
+
+<div class="topbar" id="topbar" style="display:none;">
+  <div class="brand">
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+    <img id="brandIcon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231a3c5e'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>A</text></svg>" alt="icon">
+    <span id="brandAppName">ARTDENT</span>
+  </div>
+  <div class="user-info">
+    <span class="online-status" id="onlineStatus">🟢 آنلاین</span>
+    <span class="sync-indicator" id="syncIndicator"><span class="dot"></span><span id="syncText">آماده</span></span>
+    <span>👤 <strong id="currentUser">admin</strong></span>
+    <button class="lock-btn" onclick="lockScreen()" title="قفل فوری">🔒</button>
+    <button class="lock-btn" onclick="logout()" title="خروج">🚪</button>
+  </div>
+</div>
+
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMobileMenu()"></div>
+<div class="menubar" id="menubar" style="display:none;">
+  <div class="menu-item" onclick="toggleDropdown(this)">اطلاعات ▾
+    <div class="menu-dropdown">
+      <a href="#" onclick="openDentistDialog(); return false;">👨‍⚕️ دندانپزشکان</a>
+      <a href="#" onclick="openClinicDialog(); return false;">🏥 کلینیک‌ها</a>
+      <a href="#" onclick="openTariffDialog(); return false;">💰 تعرفه خدمات</a>
+      <hr>
+      <a href="#" onclick="openSummaryDialog(); return false;">📊 خلاصه مالی</a>
+      <a href="#" onclick="openReferralDialog(); return false;">🔗 ارجاع</a>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleDropdown(this)">تحلیل ▾
+    <div class="menu-dropdown">
+      <a href="#" onclick="openDashboard(); return false;">📊 داشبورد</a>
+      <a href="#" onclick="openReportsDialog(); return false;">📈 گزارش‌ها</a>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleDropdown(this)">گزارشات ▾
+    <div class="menu-dropdown">
+      <a href="#" onclick="printReport(); return false;">🖨 چاپ</a>
+      <a href="#" onclick="exportReportHTML(); return false;">🌐 HTML</a>
+      <hr>
+      <a href="#" onclick="generateElegantInvoice(); return false;">🧾 فاکتور</a>
+      <a href="#" onclick="openArchiveDialog(); return false;">📁 بایگانی</a>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleDropdown(this)">جستجو ▾
+    <div class="menu-dropdown">
+      <a href="#" onclick="openSearchDialog(); return false;">🔍 ساده</a>
+      <a href="#" onclick="openAdvancedQueryBuilder(); return false;">⚙️ پیشرفته</a>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleDropdown(this)">پشتیبان‌گیری ▾
+    <div class="menu-dropdown">
+      <a href="#" onclick="backupEncrypted(); return false;">🔐 رمزنگاری‌شده</a>
+      <a href="#" onclick="backupDatabase(); return false;">💾 سریع</a>
+      <a href="#" onclick="restoreEncrypted(); return false;">🔓 بازیابی</a>
+      <hr>
+      <a href="#" onclick="exportAllCSV(); return false;">📊 CSV</a>
+      <a href="#" onclick="manageAutoBackups(); return false;">🗂 خودکار</a>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleDropdown(this)">امنیت ▾
+    <div class="menu-dropdown">
+      <a href="#" onclick="openSecurityCenter(); return false;">🛡 مرکز امنیت</a>
+      <a href="#" onclick="openEncryptionSettings(); return false;">🔐 رمزنگاری داده</a>
+      <a href="#" onclick="openAuditLog(); return false;">📋 لاگ فعالیت‌ها</a>
+      <a href="#" onclick="openSessionSettings(); return false;">⏱ تنظیمات نشست</a>
+      <a href="#" onclick="showPasswordPolicy(); return false;">🔑 سیاست رمز</a>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleDropdown(this)">ظاهر ▾
+    <div class="menu-dropdown">
+      <a href="#" onclick="openThemeDialog(); return false;">🎨 تم</a>
+      <a href="#" onclick="toggleDarkMode(); return false;">🌙 شب/روز</a>
+      <a href="#" onclick="toggleAutoTheme(); return false;">📅 خودکار <span id="autoThemeStatus"></span></a>
+    </div>
+  </div>
+  <div class="menu-item" onclick="toggleDropdown(this)">تنظیمات ▾
+    <div class="menu-dropdown">
+      <a href="#" onclick="openBrandingDialog(); return false;">🏢 نام و ظاهر</a>
+      <a href="#" onclick="openChangeCredentials(); return false;">🔑 تغییر رمز</a>
+      <a href="#" onclick="openAppInfo(); return false;">ℹ️ درباره</a>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="mainContainer" style="display:none;">
+  <div class="page-title" id="pageTitle">ARTDENT — ثبت خدمات</div>
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="card">
+    <div class="card-title"><span>ثبت خدمت جدید</span><span class="badge" id="formMode">حالت: افزودن</span></div>
+    <div class="form-grid">
+      <div class="form-group"><label>دندانپزشک *</label><select id="dentistSelect" onchange="onDentistChange()"></select></div>
+      <div class="form-group"><label>کلینیک</label><select id="clinicSelect"></select></div>
+      <div class="form-group"><label>نوع خدمت *</label><select id="tariffSelect" onchange="onTariffChange()"></select></div>
+      <div class="form-group"><label>نام بیمار *</label><input type="text" id="patientInput" placeholder="نام بیمار" maxlength="100"></div>
+      <div class="form-group"><label>تاریخ (شمسی) *</label><input type="text" id="dateInput" readonly onclick="openJalaliPicker(this)" style="cursor:pointer;"></div>
+      <div class="form-group"><label>تعداد *</label><input type="text" id="qtyInput" inputmode="numeric" oninput="recalcTotal()" maxlength="6"></div>
+      <div class="form-group"><label>قیمت واحد *</label><input type="text" id="unitPriceInput" inputmode="numeric" oninput="recalcTotal()" maxlength="15"></div>
+      <div class="form-group"><label>قیمت کل</label><input type="text" id="totalPriceInput" readonly></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="addBtn" onclick="saveService()">➕ افزودن</button>
+      <button class="btn btn-warning" id="updateBtn" onclick="saveService(true)" style="display:none;">✏️ ذخیره</button>
+      <button class="btn btn-secondary" onclick="clearForm()">🔄 پاک</button>
+      <button class="btn btn-secondary" onclick="cancelEdit()" id="cancelEditBtn" style="display:none;">❌ لغو</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>لیست خدمات</span><span class="badge" id="servicesCount">۰</span></div>
+    <div class="filters">
+      <div class="form-group"><label>جستجو</label><input type="text" id="quickSearch" placeholder="..." oninput="debouncedRender()"></div>
+      <div class="form-group"><label>دندانپزشک</label><select id="filterDentist" onchange="renderServices()"></select></div>
+      <div class="form-group"><label>پرداخت</label><select id="filterPaid" onchange="renderServices()"><option value="">همه</option><option value="1">شده</option><option value="0">نشده</option></select></div>
+      <div class="form-group"><label>نمایش</label><select id="filterIncluded" onchange="renderServices()"><option value="">همه</option><option value="1">نمایش</option><option value="0">مخفی</option></select></div>
+      <div class="form-group"><label>مرتب</label>
+        <select id="sortField" onchange="renderServices()">
+          <option value="service_date-desc">تاریخ (نزولی)</option>
+          <option value="service_date-asc">تاریخ (صعودی)</option>
+          <option value="id-desc">شناسه (نزولی)</option>
+          <option value="total_price-desc">مبلغ (نزولی)</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-bottom:12px;">
+      <button class="btn btn-sm" onclick="togglePaid()">💵 پرداخت</button>
+      <button class="btn btn-sm" onclick="toggleIncluded()">👁 نمایش</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteSelected()">🗑 حذف</button>
+      <button class="btn btn-sm btn-success" onclick="generateElegantInvoice()">🧾 فاکتور</button>
+      <button class="btn btn-sm btn-secondary" onclick="selectAllVisible()">☑ همه</button>
+      <button class="btn btn-sm btn-secondary" onclick="clearSelection()">☐ لغو</button>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr>
+          <th><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"></th>
+          <th>شناسه</th><th>بیمار</th><th>تاریخ</th><th>خدمت</th><th>تعداد</th>
+          <th>واحد</th><th>کل</th><th>دندانپزشک</th><th>کلینیک</th>
+          <th>پرداخت</th><th>نمایش</th><th>عملیات</th>
+        </tr></thead>
+        <tbody id="servicesTbody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px; color:var(--text-muted); font-size:12px;" id="tableFooter"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal();">
+  <div class="modal" id="modalBox">
+    <div class="modal-header"><h3 id="modalTitle"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<div class="jalali-picker hidden" id="jalaliPicker"></div>
+
+<script>
+'use strict';
+
+/* ==========================================================================
+   🌐 ENVIRONMENT DETECTION
+   ========================================================================== */
+const Environment = (function() {
+  const protocol = location.protocol;
+  const hostname = location.hostname;
+  const isSecure = window.isSecureContext === true;
+  const hasCrypto = !!(window.crypto && window.crypto.subtle && typeof window.crypto.subtle.digest === 'function');
+  const hasGetRandom = !!(window.crypto && typeof window.crypto.getRandomValues === 'function');
+  const hasIDB = !!window.indexedDB;
+  const hasSW = 'serviceWorker' in navigator;
+  const hasBroadcast = 'BroadcastChannel' in window;
+  const hasMutationObserver = 'MutationObserver' in window;
+  const hasNotification = 'Notification' in window;
+  const hasClipboard = !!(navigator.clipboard && navigator.clipboard.writeText);
+  const isLocalFile = protocol === 'file:' || protocol === 'content:' || protocol === 'android-app:';
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+  const isHttp = protocol === 'http:' || protocol === 'https:';
+  const isHttps = protocol === 'https:';
+  
+  let level, levelLabel, levelColor, levelIcon;
+  if (hasCrypto && isSecure && isHttps) { level = 'maximum'; levelLabel = 'حداکثری'; levelColor = '#27ae60'; levelIcon = '🟢'; }
+  else if (hasCrypto && (isSecure || isLocalhost)) { level = 'high'; levelLabel = 'بالا'; levelColor = '#2c5c8a'; levelIcon = '🔵'; }
+  else if (hasCrypto && isLocalFile) { level = 'good'; levelLabel = 'خوب'; levelColor = '#e67e22'; levelIcon = '🟡'; }
+  else if (hasGetRandom && hasIDB) { level = 'limited'; levelLabel = 'محدود'; levelColor = '#e67e22'; levelIcon = '🟠'; }
+  else { level = 'unsafe'; levelLabel = 'ناامن'; levelColor = '#c0392b'; levelIcon = '🔴'; }
+  
+  const limitations = [];
+  if (!hasCrypto) limitations.push({ id: 'webcrypto', title: 'Web Crypto API', desc: 'رمزنگاری سخت‌افزاری AES-GCM و PBKDF2 در دسترس نیست' });
+  if (!isSecure) limitations.push({ id: 'securecontext', title: 'Secure Context', desc: 'محیط امن (HTTPS یا localhost) نیست' });
+  if (!isHttps && !isLocalhost) limitations.push({ id: 'https', title: 'HTTPS', desc: 'اتصال رمزنگاری‌شده نیست' });
+  if (!hasSW) limitations.push({ id: 'sw', title: 'Service Worker', desc: 'حالت آفلاین PWA در دسترس نیست' });
+  if (isLocalFile) limitations.push({ id: 'localfile', title: 'اجرای محلی', desc: 'فایل به‌صورت مستقیم باز شده - امنیت مرورگر محدود است' });
+  
+  const capabilities = [];
+  if (hasCrypto) capabilities.push({ id: 'webcrypto', title: 'Web Crypto API', desc: 'AES-GCM + PBKDF2 سخت‌افزاری' });
+  if (hasIDB) capabilities.push({ id: 'idb', title: 'IndexedDB', desc: 'پایگاه‌داده محلی' });
+  if (hasSW) capabilities.push({ id: 'sw', title: 'Service Worker', desc: 'حالت آفلاین' });
+  if (hasBroadcast) capabilities.push({ id: 'broadcast', title: 'BroadcastChannel', desc: 'همگام‌سازی بین تب‌ها' });
+  if (hasMutationObserver) capabilities.push({ id: 'mo', title: 'MutationObserver', desc: 'نظارت DOM' });
+  if (hasNotification) capabilities.push({ id: 'notif', title: 'Notifications', desc: 'اعلان‌ها' });
+  if (hasClipboard) capabilities.push({ id: 'clipboard', title: 'Clipboard API', desc: 'دسترسی کلیپ‌بورد' });
+  if (isHttps || isLocalhost) capabilities.push({ id: 'pwa', title: 'PWA', desc: 'نصب به‌عنوان اپ' });
+  
+  return {
+    protocol, hostname, isSecure, hasCrypto, hasGetRandom, hasIDB, hasSW,
+    hasBroadcast, hasMutationObserver, hasNotification, hasClipboard,
+    isLocalFile, isLocalhost, isHttp, isHttps,
+    level, levelLabel, levelColor, levelIcon,
+    limitations, capabilities,
+    needsFallback: !hasCrypto,
+    summary() { return `${levelIcon} ${levelLabel} (${protocol})`; }
+  };
+})();
+
+console.log('%c🌐 ARTDENT Environment', 'color:#1a3c5e;font-weight:bold;font-size:14px;');
+console.log('  Level:', Environment.levelLabel, '|', Environment.summary());
+
+/* ==========================================================================
+   💾 STORAGE ADAPTER — IndexedDB + localStorage + Memory
+   ========================================================================== */
+const StorageAdapter = (function() {
+  'use strict';
+  
+  let _mode = 'none';
+  let _memoryStore = {};
+  let _idb = null;
+  
+  async function testIndexedDB() {
+    return new Promise((resolve) => {
+      if (!window.indexedDB || typeof window.indexedDB.open !== 'function') return resolve(false);
+      try {
+        const testName = '__artdent_test_' + Date.now();
+        const req = window.indexedDB.open(testName, 1);
+        let resolved = false;
+        const timeout = setTimeout(() => { if (!resolved) { resolved = true; resolve(false); } }, 3000);
+        req.onerror = () => { if (!resolved) { resolved = true; clearTimeout(timeout); resolve(false); } };
+        req.onblocked = () => { if (!resolved) { resolved = true; clearTimeout(timeout); resolve(false); } };
+        req.onsuccess = (e) => {
+          if (resolved) return;
+          resolved = true; clearTimeout(timeout);
+          try { e.target.result.close(); } catch (err) {}
+          try { window.indexedDB.deleteDatabase(testName); } catch (err) {}
+          resolve(true);
+        };
+        req.onupgradeneeded = (e) => {
+          if (resolved) return;
+          resolved = true; clearTimeout(timeout);
+          try { e.target.result.close(); } catch (err) {}
+          try { window.indexedDB.deleteDatabase(testName); } catch (err) {}
+          resolve(true);
+        };
+      } catch (e) { resolve(false); }
+    });
+  }
+  
+  function testLocalStorage() {
+    try {
+      const k = '__artdent_test_ls__';
+      localStorage.setItem(k, '1');
+      localStorage.removeItem(k);
+      return true;
+    } catch (e) { return false; }
+  }
+  
+  function lsKey(store, id) { return `artdent_${store}_${id}`; }
+  function lsIndexKey(store) { return `artdent_index_${store}`; }
+  
+  function lsGetAll(store) {
+    try {
+      const indexRaw = localStorage.getItem(lsIndexKey(store));
+      if (!indexRaw) return [];
+      const ids = JSON.parse(indexRaw);
+      const result = [];
+      for (const id of ids) {
+        const raw = localStorage.getItem(lsKey(store, id));
+        if (raw) { try { result.push(JSON.parse(raw)); } catch (e) {} }
+      }
+      return result;
+    } catch (e) { return []; }
+  }
+  
+  function lsPut(store, obj) {
+    try {
+      const id = obj.id != null ? obj.id : Date.now() + Math.random();
+      obj.id = id;
+      localStorage.setItem(lsKey(store, id), JSON.stringify(obj));
+      let ids = [];
+      try { ids = JSON.parse(localStorage.getItem(lsIndexKey(store)) || '[]'); } catch (e) {}
+      if (!ids.includes(id)) { ids.push(id); localStorage.setItem(lsIndexKey(store), JSON.stringify(ids)); }
+      return id;
+    } catch (e) { return null; }
+  }
+  
+  function lsAdd(store, obj) {
+    if (obj.id == null) obj.id = Date.now() * 1000 + Math.floor(Math.random() * 1000);
+    return lsPut(store, obj);
+  }
+  
+  function lsDelete(store, id) {
+    try {
+      localStorage.removeItem(lsKey(store, id));
+      let ids = [];
+      try { ids = JSON.parse(localStorage.getItem(lsIndexKey(store)) || '[]'); } catch (e) {}
+      ids = ids.filter(x => x !== id);
+      localStorage.setItem(lsIndexKey(store), JSON.stringify(ids));
+    } catch (e) {}
+  }
+  
+  function lsClear(store) {
+    try {
+      const ids = JSON.parse(localStorage.getItem(lsIndexKey(store)) || '[]');
+      for (const id of ids) localStorage.removeItem(lsKey(store, id));
+      localStorage.removeItem(lsIndexKey(store));
+    } catch (e) {}
+  }
+  
+  async function init() {
+    const idbWorks = await testIndexedDB();
+    if (idbWorks) { _mode = 'indexeddb'; console.log('💾 Storage: IndexedDB ✅'); return _mode; }
+    if (testLocalStorage()) { _mode = 'localstorage'; console.log('💾 Storage: localStorage ✅'); return _mode; }
+    _mode = 'memory';
+    console.log('💾 Storage: Memory ⚠️');
+    return _mode;
+  }
+  
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      if (_mode !== 'indexeddb') { resolve(null); return; }
+      const req = window.indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const d = e.target.result;
+        const cs = (name, opts) => d.objectStoreNames.contains(name) ? null : d.createObjectStore(name, opts);
+        cs(STORES.dentists, { keyPath: 'id', autoIncrement: true })?.createIndex('name', 'name');
+        cs(STORES.clinics, { keyPath: 'id', autoIncrement: true })?.createIndex('dentist_id', 'dentist_id');
+        cs(STORES.tariffs, { keyPath: 'id', autoIncrement: true })?.createIndex('dentist_id', 'dentist_id');
+        const ss = cs(STORES.services, { keyPath: 'id', autoIncrement: true });
+        if (ss) { ss.createIndex('dentist_id', 'dentist_id'); ss.createIndex('service_date', 'service_date'); ss.createIndex('is_paid', 'is_paid'); }
+        cs(STORES.referrals, { keyPath: 'id', autoIncrement: true })?.createIndex('dentist_id', 'dentist_id');
+        cs(STORES.invoices, { keyPath: 'id', autoIncrement: true })?.createIndex('created_at', 'created_at');
+        cs(STORES.settings, { keyPath: 'id' });
+        cs(STORES.syncLog, { keyPath: 'id', autoIncrement: true });
+        cs(STORES.meta, { keyPath: 'key' });
+        cs(STORES.templates, { keyPath: 'id', autoIncrement: true });
+        const as = cs(STORES.audit, { keyPath: 'id', autoIncrement: true });
+        if (as) as.createIndex('ts', 'ts');
+        cs(STORES.security, { keyPath: 'id' });
+      };
+      req.onsuccess = (e) => { _idb = e.target.result; resolve(_idb); };
+      req.onerror = (e) => reject(e.target.error);
+      req.onblocked = () => reject(new Error('پایگاه‌داده در تب دیگری باز است'));
+    });
+  }
+  
+  const api = {
+    init, openDB,
+    getMode: () => _mode,
+    getDB: () => _idb,
+    isIndexedDB: () => _mode === 'indexeddb',
+    isLocalStorage: () => _mode === 'localstorage',
+    isMemory: () => _mode === 'memory',
+    
+    async add(store, obj) {
+      if (_mode === 'indexeddb' && _idb) {
+        return new Promise((resolve, reject) => {
+          const tx = _idb.transaction(store, 'readwrite');
+          const req = tx.objectStore(store).add(obj);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      } else if (_mode === 'localstorage') { return lsAdd(store, obj); }
+      else {
+        const id = obj.id != null ? obj.id : Date.now() + Math.random();
+        obj.id = id;
+        if (!_memoryStore[store]) _memoryStore[store] = {};
+        _memoryStore[store][id] = JSON.parse(JSON.stringify(obj));
+        return id;
+      }
+    },
+    
+    async put(store, obj) {
+      if (_mode === 'indexeddb' && _idb) {
+        return new Promise((resolve, reject) => {
+          const tx = _idb.transaction(store, 'readwrite');
+          const req = tx.objectStore(store).put(obj);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      } else if (_mode === 'localstorage') { return lsPut(store, obj); }
+      else {
+        if (!_memoryStore[store]) _memoryStore[store] = {};
+        _memoryStore[store][obj.id] = JSON.parse(JSON.stringify(obj));
+        return obj.id;
+      }
+    },
+    
+    async get(store, id) {
+      if (_mode === 'indexeddb' && _idb) {
+        return new Promise((resolve, reject) => {
+          const tx = _idb.transaction(store, 'readonly');
+          const req = tx.objectStore(store).get(id);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      } else if (_mode === 'localstorage') {
+        try { const raw = localStorage.getItem(lsKey(store, id)); return raw ? JSON.parse(raw) : undefined; }
+        catch (e) { return undefined; }
+      } else { return _memoryStore[store] ? _memoryStore[store][id] : undefined; }
+    },
+    
+    async getAll(store) {
+      if (_mode === 'indexeddb' && _idb) {
+        return new Promise((resolve, reject) => {
+          const tx = _idb.transaction(store, 'readonly');
+          const req = tx.objectStore(store).getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+      } else if (_mode === 'localstorage') { return lsGetAll(store); }
+      else { return Object.values(_memoryStore[store] || {}); }
+    },
+    
+    async delete(store, id) {
+      if (_mode === 'indexeddb' && _idb) {
+        return new Promise((resolve, reject) => {
+          const tx = _idb.transaction(store, 'readwrite');
+          const req = tx.objectStore(store).delete(id);
+          req.onsuccess = () => resolve();
+          req.onerror = () => reject(req.error);
+        });
+      } else if (_mode === 'localstorage') { lsDelete(store, id); }
+      else { if (_memoryStore[store]) delete _memoryStore[store][id]; }
+    },
+    
+    async clear(store) {
+      if (_mode === 'indexeddb' && _idb) {
+        return new Promise((resolve, reject) => {
+          const tx = _idb.transaction(store, 'readwrite');
+          const req = tx.objectStore(store).clear();
+          req.onsuccess = () => resolve();
+          req.onerror = () => reject(req.error);
+        });
+      } else if (_mode === 'localstorage') { lsClear(store); }
+      else { _memoryStore[store] = {}; }
+    },
+    
+    async getByIndex(store, idx, val) {
+      if (_mode === 'indexeddb' && _idb) {
+        return new Promise((resolve, reject) => {
+          const tx = _idb.transaction(store, 'readonly');
+          const req = tx.objectStore(store).index(idx).getAll(val);
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+      } else {
+        const all = await api.getAll(store);
+        return all.filter(item => item[idx] === val);
+      }
+    }
+  };
+  return api;
+})();
+
+/* ==========================================================================
+   🔐 PURE SHA-256
+   ========================================================================== */
+const PureSHA256 = (function() {
+  'use strict';
+  function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
+  return {
+    hash(str) {
+      const mathPow = Math.pow, maxWord = mathPow(2, 32);
+      let result = '';
+      const words = [];
+      const asciiBitLength = str.length * 8;
+      const hashArr = [];
+      const k = [];
+      const isComposite = {};
+      let primeCounter = 0;
+      for (let candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+          hashArr[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1/3) * maxWord) | 0;
+        }
+      }
+      str = str.replace(/\r\n/g, '\n');
+      let utf8 = '';
+      for (let n = 0; n < str.length; n++) {
+        const c = str.charCodeAt(n);
+        if (c < 128) utf8 += String.fromCharCode(c);
+        else if (c < 2048) { utf8 += String.fromCharCode((c >> 6) | 192); utf8 += String.fromCharCode((c & 63) | 128); }
+        else { utf8 += String.fromCharCode((c >> 12) | 224); utf8 += String.fromCharCode(((c >> 6) & 63) | 128); utf8 += String.fromCharCode((c & 63) | 128); }
+      }
+      utf8 += '\x80';
+      while (utf8.length % 64 - 56) utf8 += '\x00';
+      for (let i = 0; i < utf8.length; i++) { const j = utf8.charCodeAt(i); words[i >> 2] |= j << ((3 - i) % 4) * 8; }
+      words[words.length] = (asciiBitLength / maxWord) | 0;
+      words[words.length] = asciiBitLength;
+      let hashWork = hashArr.slice(0);
+      for (let j = 0; j < words.length;) {
+        const w = words.slice(j, j += 16);
+        const oldHash = hashWork.slice(0);
+        for (let i = 0; i < 64; i++) {
+          const w15 = w[i - 15], w2 = w[i - 2];
+          const a = hashWork[0], e = hashWork[4];
+          const temp1 = hashWork[7] + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) + ((e & hashWork[5]) ^ (~e & hashWork[6])) + k[i] + (w[i] = (i < 16) ? w[i] : (w[i - 16] + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))) | 0);
+          const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) + ((a & hashWork[1]) ^ (a & hashWork[2]) ^ (hashWork[1] & hashWork[2]));
+          hashWork = [(temp1 + temp2) | 0].concat(hashWork);
+          hashWork[4] = (hashWork[4] + temp1) | 0;
+        }
+        for (let i = 0; i < 8; i++) hashWork[i] = (hashWork[i] + oldHash[i]) | 0;
+      }
+      for (let i = 0; i < 8; i++) {
+        for (let j = 3; j + 1; j--) {
+          const b = (hashWork[i] >> (j * 8)) & 255;
+          result += ((b < 16) ? 0 : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+  };
+})();
+
+function randomBytes(n) {
+  const arr = new Uint8Array(n);
+  if (Environment.hasGetRandom) { window.crypto.getRandomValues(arr); return arr; }
+  for (let i = 0; i < n; i++) arr[i] = Math.floor(Math.random() * 256);
+  return arr;
+}
+
+/* ==========================================================================
+   🛡 CRYPTO VAULT
+   ========================================================================== */
+const CryptoVault = (function() {
+  'use strict';
+  const PBKDF2_ITERATIONS = Environment.hasCrypto ? 250000 : 100000;
+  let _key = null;
+  let _keyDerivedAt = 0;
+  let _keyId = null;
+  let _mode = 'none';
+  let _passwordCache = null;
+  const hasWebCrypto = Environment.hasCrypto;
+  
+  function fallbackDeriveKey(password, saltHex) {
+    let hash = PureSHA256.hash('artdent:' + password + ':' + saltHex);
+    for (let i = 0; i < 1000; i++) hash = PureSHA256.hash(hash + saltHex);
+    return hash;
+  }
+  function fallbackEncrypt(plaintext, password, saltHex) {
+    const key = fallbackDeriveKey(password, saltHex);
+    const iv = randomBytes(16);
+    const ivHex = bytesToHex(iv);
+    let ct = '';
+    const str = String(plaintext);
+    for (let i = 0; i < str.length; i++) {
+      const k = key.charCodeAt(i % key.length);
+      const p = str.charCodeAt(i);
+      ct += String.fromCharCode((p ^ k) & 0xFF);
+    }
+    const ctHex = Array.from(ct).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+    return { __enc: true, iv: ivHex, ct: ctHex, __fb: true };
+  }
+  function fallbackDecrypt(encrypted, password, saltHex) {
+    const key = fallbackDeriveKey(password, saltHex);
+    const ctHex = encrypted.ct;
+    let ct = '';
+    for (let i = 0; i < ctHex.length; i += 2) ct += String.fromCharCode(parseInt(ctHex.substr(i, 2), 16));
+    let pt = '';
+    for (let i = 0; i < ct.length; i++) {
+      const k = key.charCodeAt(i % key.length);
+      const c = ct.charCodeAt(i);
+      pt += String.fromCharCode((c ^ k) & 0xFF);
+    }
+    return pt;
+  }
+  
+  return {
+    getMode() { return _mode; },
+    hasWebCrypto() { return hasWebCrypto; },
+    getIterations() { return PBKDF2_ITERATIONS; },
+    
+    async unlock(password, saltHex) {
+      _keyDerivedAt = Date.now();
+      _keyId = 'k_' + Date.now().toString(36);
+      _passwordCache = { password, saltHex };
+      if (hasWebCrypto) {
+        try {
+          _mode = 'webcrypto';
+          const salt = hexToBytes(saltHex);
+          const enc = new TextEncoder();
+          const km = await window.crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+          _key = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
+            km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+          );
+          return _keyId;
+        } catch (e) { _mode = 'fallback'; return _keyId; }
+      }
+      _mode = 'fallback';
+      return _keyId;
+    },
+    
+    async deriveRaw(password, saltHex) {
+      if (hasWebCrypto) {
+        try {
+          const salt = hexToBytes(saltHex);
+          const enc = new TextEncoder();
+          const km = await window.crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+          const bits = await window.crypto.subtle.deriveBits(
+            { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' }, km, 256
+          );
+          return new Uint8Array(bits);
+        } catch (e) {}
+      }
+      const hashHex = fallbackDeriveKey(password, saltHex || 'default');
+      const bytes = new Uint8Array(32);
+      for (let i = 0; i < 32; i++) bytes[i] = parseInt(hashHex.substr(i * 2, 2), 16);
+      return bytes;
+    },
+    
+    async encrypt(plaintext) {
+      if (_mode === 'webcrypto' && _key) {
+        const iv = randomBytes(12);
+        const ct = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, _key, new TextEncoder().encode(String(plaintext)));
+        return { __enc: true, iv: bytesToHex(iv), ct: bytesToHex(new Uint8Array(ct)) };
+      }
+      if (!_passwordCache) throw new Error('Vault locked');
+      return fallbackEncrypt(String(plaintext), _passwordCache.password, _passwordCache.saltHex);
+    },
+    
+    async decrypt(encrypted) {
+      if (!encrypted || !encrypted.__enc) return encrypted;
+      if (_mode === 'webcrypto' && _key && !encrypted.__fb) {
+        const iv = hexToBytes(encrypted.iv);
+        const ct = hexToBytes(encrypted.ct);
+        const pt = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, _key, ct);
+        return new TextDecoder().decode(pt);
+      }
+      if (!_passwordCache) throw new Error('Vault locked');
+      return fallbackDecrypt(encrypted, _passwordCache.password, _passwordCache.saltHex);
+    },
+    
+    lock() { _key = null; _keyDerivedAt = 0; _keyId = null; _mode = 'none'; _passwordCache = null; },
+    isLocked() { return !_key && !_passwordCache; },
+    
+    async encryptWithPassword(data, password) {
+      const salt = randomBytes(16);
+      const saltHex = bytesToHex(salt);
+      if (hasWebCrypto) {
+        try {
+          const enc = new TextEncoder();
+          const km = await window.crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+          const key = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
+            km, { name: 'AES-GCM', length: 256 }, false, ['encrypt']
+          );
+          const iv = randomBytes(12);
+          const ct = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(data)));
+          return { salt: saltHex, iv: bytesToHex(iv), ct: bytesToHex(new Uint8Array(ct)) };
+        } catch (e) {}
+      }
+      const enc = fallbackEncrypt(JSON.stringify(data), password, saltHex);
+      return { salt: saltHex, iv: enc.iv, ct: enc.ct, __fb: true };
+    },
+    
+    async decryptWithPassword(payload, password) {
+      if (hasWebCrypto && !payload.__fb) {
+        try {
+          const salt = hexToBytes(payload.salt);
+          const iv = hexToBytes(payload.iv);
+          const ct = hexToBytes(payload.ct);
+          const enc = new TextEncoder();
+          const km = await window.crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+          const key = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
+            km, { name: 'AES-GCM', length: 256 }, false, ['decrypt']
+          );
+          const pt = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+          return JSON.parse(new TextDecoder().decode(pt));
+        } catch (e) { throw new Error('رمزگشایی ناموفق: ' + e.message); }
+      }
+      const pt = fallbackDecrypt({ iv: payload.iv, ct: payload.ct }, password, payload.salt);
+      return JSON.parse(pt);
+    }
+  };
+})();
+
+/* ==========================================================================
+   🔧 Helpers
+   ========================================================================== */
+function bytesToHex(bytes) { if (!bytes) return ''; return Array.from(bytes).map(b => (b < 16 ? '0' : '') + b.toString(16)).join(''); }
+function hexToBytes(hex) {
+  if (!hex || typeof hex !== 'string') return new Uint8Array(0);
+  const len = Math.floor(hex.length / 2);
+  const a = new Uint8Array(len);
+  for (let i = 0; i < len; i++) a[i] = parseInt(hex.substr(i * 2, 2), 16) || 0;
+  return a;
+}
+
+async function hashPassword(password, saltHex) {
+  const salt = saltHex ? hexToBytes(saltHex) : randomBytes(16);
+  const raw = await CryptoVault.deriveRaw(password, bytesToHex(salt));
+  return { hash: bytesToHex(raw), salt: bytesToHex(salt) };
+}
+async function verifyPassword(password, expectedHash, saltHex) {
+  const { hash } = await hashPassword(password, saltHex);
+  return timingSafeEqual(hash, expectedHash);
+}
+function timingSafeEqual(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  let r = 0;
+  for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return r === 0;
+}
+
+/* ==========================================================================
+   🛡 Security Core
+   ========================================================================== */
+const SecurityCore = (function() {
+  const violations = [];
+  let status = { frozen: false, domGuard: false, behaviorMonitor: false, integrityGuard: false };
+  
+  function freezePrototypes() {
+    try {
+      if (!Object.defineProperty) return false;
+      ['fetch', 'XMLHttpRequest', 'indexedDB', 'crypto', 'localStorage', 'sessionStorage'].forEach(key => {
+        try { if (window[key]) Object.defineProperty(window, key, { writable: false, configurable: false }); } catch (e) {}
+      });
+      status.frozen = true;
+      return true;
+    } catch (e) { return false; }
+  }
+  
+  function reportViolation(type, details) {
+    violations.push({ type, details, ts: Date.now() });
+    try { if (typeof window._auditLog === 'function') window._auditLog('security_violation', { type, details }); } catch (e) {}
+    if (typeof window.showToast === 'function') window.showToast(`⚠️ دستکاری: ${type}`, 'error', 5000);
+  }
+  
+  function updateShield(state, text) {
+    const el = document.getElementById('securityShield');
+    const txt = document.getElementById('shieldStatus');
+    if (!el || !txt) return;
+    txt.textContent = text;
+    el.className = 'security-shield';
+    if (state === 'alert') el.classList.add('alert');
+    else if (state === 'warning') el.classList.add('warning');
+  }
+  
+  function setStatus(key, val) { status[key] = val; }
+  return {
+    freezePrototypes, reportViolation, updateShield, setStatus,
+    getViolations: () => [...violations],
+    getStatus: () => ({ ...status })
+  };
+})();
+
+const IntegrityGuard = (function() {
+  let baseline = null;
+  let isRunning = false;
+  async function hashStr(str) {
+    try {
+      if (Environment.hasCrypto) {
+        const buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(str)));
+        return bytesToHex(new Uint8Array(buf));
+      }
+    } catch (e) {}
+    return PureSHA256.hash(String(str));
+  }
+  function snapshotCriticalFunctions() {
+    try {
+      const fns = [window.fetch, window.XMLHttpRequest, Object.defineProperty];
+      return fns.map(f => { try { return String(f).substring(0, 300); } catch (e) { return 'ERR'; } }).join('|');
+    } catch (e) { return ''; }
+  }
+  function snapshotScripts() {
+    try { return [...document.querySelectorAll('script')].map(s => s.src || s.textContent.substring(0, 200)).join('||'); } catch (e) { return ''; }
+  }
+  async function captureBaseline() {
+    baseline = { criticalFns: await hashStr(snapshotCriticalFunctions()), scripts: await hashStr(snapshotScripts()), capturedAt: Date.now() };
+  }
+  async function checkIntegrity() {
+    if (!baseline) return [];
+    const issues = [];
+    try {
+      const currentFns = await hashStr(snapshotCriticalFunctions());
+      if (currentFns !== baseline.criticalFns) issues.push({ severity: 'high', msg: 'توابع حیاتی تغییر کرده‌اند' });
+      const suspicious = document.querySelectorAll('iframe:not([data-artdent-ok]), object:not([data-artdent-ok]), embed:not([data-artdent-ok])');
+      if (suspicious.length > 0) issues.push({ severity: 'high', msg: `${suspicious.length} عنصر مشکوک` });
+    } catch (e) {}
+    return issues;
+  }
+  async function monitor(interval = 15000) {
+    if (isRunning) return;
+    isRunning = true;
+    try { await captureBaseline(); } catch (e) { isRunning = false; return; }
+    SecurityCore.setStatus('integrityGuard', true);
+    setInterval(async () => {
+      try {
+        const issues = await checkIntegrity();
+        const high = issues.filter(i => i.severity === 'high');
+        for (const issue of high) SecurityCore.reportViolation('integrity', issue.msg);
+        if (high.some(i => i.msg.includes('توابع حیاتی'))) { if (typeof window.emergencyLock === 'function') window.emergencyLock('دستکاری'); }
+        baseline.scripts = await hashStr(snapshotScripts());
+      } catch (e) {}
+    }, interval);
+  }
+  return { monitor, checkIntegrity, captureBaseline };
+})();
+
+const DOMGuard = (function() {
+  const ownChanges = new WeakMap();
+  let observer = null;
+  const DANGEROUS_TAGS = ['IFRAME', 'OBJECT', 'EMBED', 'APPLET'];
+  function markOwn(el) { if (!el) return; ownChanges.set(el, true); setTimeout(() => ownChanges.delete(el), 100); }
+  function inspect(node) {
+    if (!node || node.nodeType !== 1) return;
+    const tag = node.tagName;
+    if (DANGEROUS_TAGS.includes(tag)) {
+      if (node.hasAttribute('data-artdent-ok')) return;
+      SecurityCore.reportViolation('dom_injection', { tag });
+      try { node.remove(); } catch (e) {}
+    }
+  }
+  function start() {
+    if (observer || !Environment.hasMutationObserver) return;
+    try {
+      observer = new MutationObserver(mutations => {
+        for (const m of mutations) {
+          if (ownChanges.has(m.target)) continue;
+          if (m.type === 'childList') m.addedNodes.forEach(node => { if (node.nodeType === 1) inspect(node); });
+        }
+      });
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+      SecurityCore.setStatus('domGuard', true);
+    } catch (e) {}
+  }
+  return { start, markOwn };
+})();
+
+const ExtensionDetector = (function() {
+  function detect() {
+    const detected = [];
+    try {
+      if (window.grammarly || document.querySelector('[data-grammarly]')) detected.push('Grammarly');
+      if (window.__lastPassGlobal) detected.push('LastPass');
+      if (window.honeyExt) detected.push('Honey');
+      if (document.querySelector('[data-1p-ignore]') || document.querySelector('[data-bitwarden-watching]')) detected.push('Password Manager');
+    } catch (e) {}
+    return detected;
+  }
+  function checkForeignGlobals() {
+    const whitelist = new Set(['window','document','self','top','parent','frames','navigator','location','history','screen','console','crypto','performance','fetch','XMLHttpRequest','WebSocket','indexedDB','localStorage','sessionStorage','caches','setTimeout','clearTimeout','setInterval','clearInterval','requestAnimationFrame','cancelAnimationFrame','requestIdleCallback','addEventListener','removeEventListener','dispatchEvent','Event','CustomEvent','MutationObserver','IntersectionObserver','ResizeObserver','Notification','ServiceWorker','Worker','SharedWorker','BroadcastChannel','Blob','File','FileReader','FormData','URL','URLSearchParams','TextEncoder','TextDecoder','MessageChannel','AbortController','AbortSignal','Promise','Map','Set','WeakMap','WeakSet','Proxy','Reflect','ArrayBuffer','DataView','Uint8Array','Uint16Array','Uint32Array','Int8Array','Int16Array','Int32Array','Float32Array','Float64Array','BigInt64Array','BigUint64Array','Object','Array','String','Number','Boolean','Symbol','BigInt','Date','RegExp','Math','JSON','Intl','Atomics','Error','TypeError','RangeError','ReferenceError','SyntaxError','EvalError','URIError','AggregateError','Function','AsyncFunction','eval','parseInt','parseFloat','isNaN','isFinite','encodeURIComponent','decodeURIComponent','encodeURI','decodeURI','atob','btoa','alert','confirm','prompt','open','close','focus','blur','print','postMessage','matchMedia','getComputedStyle','getSelection','scroll','scrollTo','scrollBy','name','length','customElements','chrome','browser','trustedTypes','scheduler','speechSynthesis','SpeechSynthesisUtterance','onload','onunload','onerror','onbeforeunload','onhashchange','onpopstate','ononline','onoffline','onstorage','onmessage','onmessageerror']);
+    const foreign = [];
+    try {
+      const keys = Object.getOwnPropertyNames(window);
+      for (const key of keys) {
+        if (key.length < 2 || key.length > 50) continue;
+        if (whitelist.has(key)) continue;
+        if (key.startsWith('__') || key.startsWith('_')) continue;
+        if (key.startsWith('on')) continue;
+        if (key.startsWith('HTML')) continue;
+        if (/^[A-Z]/.test(key)) continue;
+        try { if (/ext|addon|plugin|inject/i.test(key)) foreign.push({ key, type: typeof window[key] }); } catch (e) {}
+      }
+    } catch (e) {}
+    return foreign;
+  }
+  return { detect, checkForeignGlobals };
+})();
+
+const BehaviorMonitor = (function() {
+  let clickTimes = [];
+  let lastClick = 0;
+  let devtoolsCheckId = null;
+  let devtoolsDetected = false;
+  function recordClick(e) {
+    const now = Date.now();
+    const gap = now - lastClick;
+    if (gap < 5) {
+      clickTimes.push(now);
+      clickTimes = clickTimes.filter(t => now - t < 1000);
+      if (clickTimes.length > 20) { SecurityCore.reportViolation('bot_behavior', { count: clickTimes.length }); clickTimes = []; }
+    }
+    lastClick = now;
+  }
+  function startDevtoolsDetection() {
+    const threshold = 160;
+    devtoolsCheckId = setInterval(() => {
+      const wd = window.outerWidth - window.innerWidth;
+      const hd = window.outerHeight - window.innerHeight;
+      const sizeDetected = wd > threshold || hd > threshold;
+      if (sizeDetected && !devtoolsDetected) { devtoolsDetected = true; try { if (typeof window._auditLog === 'function') window._auditLog('devtools_opened'); } catch (e) {} }
+      else if (!sizeDetected) devtoolsDetected = false;
+    }, 3000);
+  }
+  function start() { document.addEventListener('click', recordClick, true); startDevtoolsDetection(); SecurityCore.setStatus('behaviorMonitor', true); }
+  return { start, isDevtoolsOpen: () => devtoolsDetected };
+})();
+
+(function secureStartup() {
+  try {
+    console.log('%c🛡 ARTDENT Security Starting...', 'color:#1a3c5e;font-weight:bold;');
+    SecurityCore.freezePrototypes();
+    DOMGuard.start();
+    BehaviorMonitor.start();
+    setTimeout(() => { try { IntegrityGuard.monitor(15000); } catch (e) {} }, 5000);
+    let state = 'ok';
+    let text = Environment.summary();
+    if (Environment.level === 'unsafe') state = 'alert';
+    else if (Environment.level === 'limited' || Environment.level === 'good') state = 'warning';
+    SecurityCore.updateShield(state, text);
+  } catch (e) { console.error('Security startup failed:', e); }
+})();
+
+/* ==========================================================================
+   📱 ARTDENT Application
+   ========================================================================== */
+const DB_NAME = 'ARTDENT_DB';
+const DB_VERSION = 5;
+const STORES = {
+  dentists: 'dentists', clinics: 'clinics', tariffs: 'tariffs',
+  services: 'services', referrals: 'lab_referrals',
+  invoices: 'saved_invoices', settings: 'app_settings',
+  syncLog: 'sync_log', meta: 'meta', templates: 'templates',
+  audit: 'audit_log', security: 'security_meta'
+};
+const PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+const LATIN_DIGITS = '0123456789';
+const PERSIAN_MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const PERSIAN_WEEKDAYS = ['ش','ی','د','س','چ','پ','ج'];
+const APP_VERSION = '6.1.0';
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_TIME = 5 * 60 * 1000;
+const IDLE_TIMEOUT = 10 * 60 * 1000;
+const SESSION_TIMEOUT = 30 * 60 * 1000;
+
+const SENSITIVE_FIELDS = {
+  services: ['patient_name', 'service_name'],
+  dentists: ['email', 'address', 'phone'],
+  clinics: ['phone', 'address'],
+  referrals: ['patient_name', 'service_name', 'notes']
+};
+
+let db = null;
+let currentUser = 'admin';
+let currentSettings = null;
+let securityMeta = null;
+let editingServiceId = null;
+let selectedServiceIds = new Set();
+let currentJalaliTarget = null;
+let currentJalaliYear = null;
+let currentJalaliMonth = null;
+let syncChannel = null;
+let autoBackupTimer = null;
+let idleTimer = null;
+let sessionTimer = null;
+let loginAttempts = 0;
+let lockoutUntil = 0;
+
+const memoryCache = {
+  services: new Map(), dentists: new Map(), clinics: new Map(),
+  tariffs: new Map(), referrals: new Map()
+};
+
+function toPersianDigits(t) { return t == null ? '' : String(t).replace(/[0-9]/g, d => PERSIAN_DIGITS[+d]); }
+function toLatinDigits(t) { return t == null ? '' : String(t).replace(/[۰-۹]/g, d => LATIN_DIGITS[PERSIAN_DIGITS.indexOf(d)]).replace(/[٠-٩]/g, d => LATIN_DIGITS['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]); }
+function formatPrice(v) { const n = parseFloat(v) || 0; return toPersianDigits(n.toLocaleString('en-US', { maximumFractionDigits: 0 })); }
+function parseNumber(t) { const c = toLatinDigits(String(t || '')).replace(/,/g, '').trim(); const n = parseFloat(c); return isNaN(n) ? 0 : n; }
+function escapeHtml(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+function debounce(fn, delay) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); }; }
+function throttle(fn, limit) { let inThrottle; return (...args) => { if (!inThrottle) { fn(...args); inThrottle = true; setTimeout(() => inThrottle = false, limit); } }; }
+
+const JalaliDate = {
+  toGregorian(jy, jm, jd) { jy += 1595; let days = -355668 + (365 * jy) + (~~(jy / 33) * 8) + ~~(((jy % 33) + 3) / 4) + jd; days += (jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30 + 186); let gy = 400 * ~~(days / 146097); days %= 146097; if (days > 36524) { gy += 100 * ~~(--days / 36524); days %= 36524; if (days >= 365) days++; } gy += 4 * ~~(days / 1461); days %= 1461; if (days > 365) { gy += ~~((days - 1) / 365); days = (days - 1) % 365; } let gd = days + 1; const sa = [0,31,(gy%4===0&&gy%100!==0)||(gy%400===0)?29:28,31,30,31,30,31,31,30,31,30,31]; let gm = 0; for (gm = 0; gm < 13 && gd > sa[gm]; gm++) gd -= sa[gm]; return { gy, gm, gd }; },
+  toJalali(gy, gm, gd) { const g = [0,31,59,90,120,151,181,212,243,273,304,334]; let jy = (gy <= 1600) ? 0 : 979; gy -= (gy <= 1600) ? 621 : 1600; const gy2 = (gm > 2) ? (gy + 1) : gy; let days = (365 * gy) + ~~((gy2 + 3) / 4) - ~~((gy2 + 99) / 100) + ~~((gy2 + 399) / 400) - 80 + gd + g[gm - 1]; jy += 33 * ~~(days / 12053); days %= 12053; jy += 4 * ~~(days / 1461); days %= 1461; if (days > 365) { jy += ~~((days - 1) / 365); days = (days - 1) % 365; } const jm = (days < 186) ? 1 + ~~(days / 31) : 7 + ~~((days - 186) / 30); const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30)); return { jy, jm, jd }; },
+  monthLength(jy, jm) { if (jm <= 6) return 31; if (jm <= 11) return 30; return ((jy % 33 === 1) || (jy % 33 === 5) || (jy % 33 === 9) || (jy % 33 === 13) || (jy % 33 === 17) || (jy % 33 === 22) || (jy % 33 === 26) || (jy % 33 === 30)) ? 30 : 29; },
+  today() { const n = new Date(); return this.toJalali(n.getFullYear(), n.getMonth() + 1, n.getDate()); },
+  format(jy, jm, jd, pd = true) { const s = `${jy}/${String(jm).padStart(2,'0')}/${String(jd).padStart(2,'0')}`; return pd ? toPersianDigits(s) : s; },
+  jalaliStrToISO(str) { const c = toLatinDigits(str).replace(/-/g, '/').trim(); const p = c.split('/'); if (p.length !== 3) throw new Error('فرمت تاریخ نامعتبر'); const jy = parseInt(p[0]), jm = parseInt(p[1]), jd = parseInt(p[2]); if (isNaN(jy) || isNaN(jm) || isNaN(jd)) throw new Error('تاریخ معتبر نیست'); if (jm < 1 || jm > 12) throw new Error('ماه بین ۱ تا ۱۲'); if (jd < 1 || jd > 31) throw new Error('روز بین ۱ تا ۳۱'); const g = this.toGregorian(jy, jm, jd); return `${g.gy}-${String(g.gm).padStart(2,'0')}-${String(g.gd).padStart(2,'0')}`; },
+  isoToJalaliStr(iso) { if (!iso) return ''; try { const [y,m,d] = iso.split('-').map(Number); const j = this.toJalali(y,m,d); return this.format(j.jy, j.jm, j.jd, true); } catch (e) { return iso; } }
+};
+
+function openJalaliPicker(el) {
+  currentJalaliTarget = el;
+  const t = JalaliDate.today();
+  const cv = el.value ? toLatinDigits(el.value).replace(/-/g, '/').split('/').map(Number) : [];
+  currentJalaliYear = (cv.length === 3 && !isNaN(cv[0])) ? cv[0] : t.jy;
+  currentJalaliMonth = (cv.length === 3 && !isNaN(cv[1])) ? cv[1] : t.jm;
+  renderJalaliPicker();
+  const p = document.getElementById('jalaliPicker');
+  p.classList.remove('hidden');
+  const rect = el.getBoundingClientRect();
+  let left = rect.left + window.scrollX;
+  if (left + 290 > window.innerWidth) left = window.innerWidth - 300;
+  if (left < 10) left = 10;
+  p.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+  p.style.left = left + 'px';
+  setTimeout(() => document.addEventListener('click', closeJalaliPickerOnOutside), 50);
+}
+function closeJalaliPickerOnOutside(e) {
+  const p = document.getElementById('jalaliPicker');
+  if (p && !p.contains(e.target) && e.target !== currentJalaliTarget) {
+    p.classList.add('hidden');
+    document.removeEventListener('click', closeJalaliPickerOnOutside);
+  }
+}
+function renderJalaliPicker() {
+  const p = document.getElementById('jalaliPicker');
+  const t = JalaliDate.today();
+  const dim = JalaliDate.monthLength(currentJalaliYear, currentJalaliMonth);
+  const fd = JalaliDate.toGregorian(currentJalaliYear, currentJalaliMonth, 1);
+  const fd2 = new Date(fd.gy, fd.gm - 1, fd.gd);
+  const off = (fd2.getDay() + 1) % 7;
+  let h = `<div class="jalali-header"><button onclick="changeJalaliMonth(-1)">‹</button><span>${PERSIAN_MONTHS[currentJalaliMonth-1]} ${toPersianDigits(currentJalaliYear)}</span><button onclick="changeJalaliMonth(1)">›</button></div>
+  <div style="text-align:center;margin-bottom:6px;"><button class="btn btn-sm btn-secondary" onclick="setJalaliToday()" style="font-size:11px;padding:3px 10px;">امروز</button></div>
+  <div class="jalali-grid">`;
+  PERSIAN_WEEKDAYS.forEach(d => h += `<div class="day-name">${d}</div>`);
+  for (let i = 0; i < off; i++) h += `<div></div>`;
+  for (let d = 1; d <= dim; d++) {
+    const isT = (t.jy === currentJalaliYear && t.jm === currentJalaliMonth && t.jd === d);
+    const isS = currentJalaliTarget && toLatinDigits(currentJalaliTarget.value).replace(/-/g,'/') === `${currentJalaliYear}/${String(currentJalaliMonth).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
+    h += `<div class="day ${isT?'today':''} ${isS?'selected':''}" onclick="pickJalaliDay(${d})">${toPersianDigits(d)}</div>`;
+  }
+  h += `</div>`;
+  p.innerHTML = h;
+}
+function changeJalaliMonth(d) { currentJalaliMonth += d; if (currentJalaliMonth > 12) { currentJalaliMonth = 1; currentJalaliYear++; } if (currentJalaliMonth < 1) { currentJalaliMonth = 12; currentJalaliYear--; } renderJalaliPicker(); }
+function setJalaliToday() { const t = JalaliDate.today(); currentJalaliYear = t.jy; currentJalaliMonth = t.jm; renderJalaliPicker(); pickJalaliDay(t.jd); }
+function pickJalaliDay(d) { if (!currentJalaliTarget) return; currentJalaliTarget.value = JalaliDate.format(currentJalaliYear, currentJalaliMonth, d); document.getElementById('jalaliPicker').classList.add('hidden'); document.removeEventListener('click', closeJalaliPickerOnOutside); }
+
+async function auditLog(action, details = {}) {
+  try {
+    if (!db && !StorageAdapter.isLocalStorage() && !StorageAdapter.isMemory()) return;
+    const entry = { action, details: JSON.stringify(details).substring(0, 2000), user: currentUser, device: getDeviceId(), ts: Date.now(), ua: navigator.userAgent.substring(0, 200) };
+    await StorageAdapter.add(STORES.audit, entry);
+  } catch (e) {}
+}
+window._auditLog = auditLog;
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => { lockScreen(); showToast('به‌دلیل بی‌کاری قفل شد', 'warning', 5000); auditLog('idle_lock'); }, IDLE_TIMEOUT);
+}
+function startSessionTimer() {
+  clearTimeout(sessionTimer);
+  sessionTimer = setTimeout(() => { logout(); showToast('نشست منقضی شد', 'warning', 5000); auditLog('session_expired'); }, SESSION_TIMEOUT);
+}
+function attachIdleListeners() {
+  ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(ev => document.addEventListener(ev, throttle(resetIdleTimer, 5000)));
+  resetIdleTimer();
+}
+function lockScreen() {
+  if (document.getElementById('lockScreen').classList.contains('show')) return;
+  CryptoVault.lock();
+  document.getElementById('lockScreen').classList.add('show');
+  document.getElementById('unlockPassword').value = '';
+  document.getElementById('unlockError').textContent = '';
+  setTimeout(() => document.getElementById('unlockPassword').focus(), 100);
+}
+async function tryUnlock() {
+  const pwd = document.getElementById('unlockPassword').value;
+  if (!pwd) return;
+  try {
+    if (lockoutUntil > Date.now()) {
+      const remaining = Math.ceil((lockoutUntil - Date.now()) / 1000);
+      throw new Error(`به‌دلیل تلاش‌های ناموفق، ${remaining} ثانیه صبر کنید`);
+    }
+    const ok = await verifyPassword(pwd, currentSettings.password_hash, currentSettings.password_salt);
+    if (!ok) {
+      loginAttempts++;
+      if (loginAttempts >= MAX_LOGIN_ATTEMPTS) { lockoutUntil = Date.now() + LOCKOUT_TIME; loginAttempts = 0; await auditLog('login_lockout'); }
+      document.getElementById('unlockError').textContent = `رمز نادرست (${loginAttempts}/${MAX_LOGIN_ATTEMPTS})`;
+      await auditLog('unlock_failed');
+      return;
+    }
+    loginAttempts = 0;
+    lockoutUntil = 0;
+    if (currentSettings.encryption_enabled && currentSettings.encryption_salt) await CryptoVault.unlock(pwd, currentSettings.encryption_salt);
+    document.getElementById('lockScreen').classList.remove('show');
+    resetIdleTimer();
+    await auditLog('unlock_success');
+    showToast('باز شد', 'success');
+    Object.values(memoryCache).forEach(m => m.clear());
+    await renderServices(); await updateStats();
+  } catch (e) { document.getElementById('unlockError').textContent = e.message; }
+}
+function emergencyLock(reason) {
+  CryptoVault.lock();
+  Object.values(memoryCache).forEach(m => m.clear());
+  document.getElementById('mainContainer').innerHTML = '';
+  auditLog('emergency_lock', { reason });
+  showModal('🚨 قفل اضطراری', `
+    <div style="text-align:center;">
+      <div style="font-size:64px;">🚨</div>
+      <h3 style="color:#c0392b;">قفل اضطراری</h3>
+      <p>به‌دلیل فعالیت مشکوک، سیستم قفل شد.</p>
+      <p style="margin-top:12px;font-size:12px;color:#888;">دلیل: ${escapeHtml(reason)}</p>
+    </div>
+  `, `<button class="btn btn-danger" onclick="location.reload()">🔄 راه‌اندازی مجدد</button>`, 'modal-sm');
+}
+window.emergencyLock = emergencyLock;
+
+function showToast(msg, type = 'info', dur = 3000) {
+  const c = document.getElementById('toastContainer');
+  if (!c) return;
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  DOMGuard.markOwn(t);
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, dur);
+}
+window.showToast = showToast;
+function showModal(title, body, footer = '', size = '') {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalFooter').innerHTML = footer;
+  document.getElementById('modalBox').className = 'modal ' + size;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.getElementById('modalBody').innerHTML = '';
+  document.getElementById('modalFooter').innerHTML = '';
+}
+function confirmAsync(message) {
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.className = 'modal-overlay active'; ov.style.zIndex = '5000';
+    ov.innerHTML = `<div class="modal modal-sm">
+      <div class="modal-header"><h3>تأیید</h3></div>
+      <div class="modal-body"><p style="font-size:14px;line-height:1.8;">${escapeHtml(message)}</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cNo">انصراف</button>
+        <button class="btn btn-danger" id="cYes">تأیید</button>
+      </div></div>`;
+    DOMGuard.markOwn(ov);
+    document.body.appendChild(ov);
+    ov.querySelector('#cYes').onclick = () => { ov.remove(); resolve(true); };
+    ov.querySelector('#cNo').onclick = () => { ov.remove(); resolve(false); };
+    ov.onclick = e => { if (e.target === ov) { ov.remove(); resolve(false); } };
+  });
+}
+function showProgress(a) { const el = document.getElementById('progressBar'); if (a) el.classList.add('active'); else el.classList.remove('active'); }
+function toggleMobileMenu() { document.getElementById('menubar').classList.toggle('mobile-open'); document.getElementById('menuOverlay').classList.toggle('active'); }
+function toggleDropdown(el) {
+  if (window.innerWidth <= 900) {
+    const dd = el.querySelector('.menu-dropdown');
+    if (dd) dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+    el.classList.toggle('open');
+  }
+}
+
+async function encryptRecord(store, obj) {
+  const fields = SENSITIVE_FIELDS[store];
+  if (!fields) return obj;
+  const out = { ...obj };
+  for (const f of fields) {
+    if (out[f] != null && out[f] !== '') {
+      try { out[`__enc_${f}`] = await CryptoVault.encrypt(String(out[f])); delete out[f]; } catch (e) {}
+    }
+  }
+  out.__encrypted = true;
+  return out;
+}
+async function decryptRecord(store, obj) {
+  if (!obj || !obj.__encrypted) return obj;
+  const fields = SENSITIVE_FIELDS[store];
+  if (!fields) return obj;
+  const out = { ...obj };
+  for (const f of fields) {
+    if (out[`__enc_${f}`]) {
+      try { out[f] = await CryptoVault.decrypt(out[`__enc_${f}`]); } catch (e) { out[f] = '[خطای رمزگشایی]'; }
+      delete out[`__enc_${f}`];
+    }
+  }
+  delete out.__encrypted;
+  return out;
+}
+async function dbAdd(store, obj) {
+  if (!obj._updated_at) obj._updated_at = Date.now();
+  let toSave = obj;
+  if (!CryptoVault.isLocked() && SENSITIVE_FIELDS[store] && !obj.__encrypted) {
+    try { toSave = await encryptRecord(store, obj); } catch (e) {}
+  }
+  const result = await StorageAdapter.add(store, toSave);
+  if (memoryCache[store]) memoryCache[store].set(toSave.id || result, obj);
+  return result;
+}
+async function dbPut(store, obj) {
+  if (!obj._updated_at) obj._updated_at = Date.now();
+  let toSave = obj;
+  if (!CryptoVault.isLocked() && SENSITIVE_FIELDS[store] && !obj.__encrypted) {
+    try { toSave = await encryptRecord(store, obj); } catch (e) {}
+  }
+  const result = await StorageAdapter.put(store, toSave);
+  if (memoryCache[store]) memoryCache[store].set(obj.id, obj);
+  return result;
+}
+async function dbGet(store, id) {
+  if (memoryCache[store] && memoryCache[store].has(id)) return memoryCache[store].get(id);
+  let r = await StorageAdapter.get(store, id);
+  if (r && !CryptoVault.isLocked() && SENSITIVE_FIELDS[store] && r.__encrypted) {
+    try { r = await decryptRecord(store, r); } catch (e) {}
+  }
+  if (r && memoryCache[store]) memoryCache[store].set(id, r);
+  return r;
+}
+async function dbGetAll(store) {
+  let list = await StorageAdapter.getAll(store);
+  if (!CryptoVault.isLocked() && SENSITIVE_FIELDS[store]) {
+    list = await Promise.all(list.map(async r => {
+      if (r && r.__encrypted) { try { return await decryptRecord(store, r); } catch (e) { return r; } }
+      return r;
+    }));
+  }
+  return list || [];
+}
+async function dbDelete(store, id) {
+  await StorageAdapter.delete(store, id);
+  if (memoryCache[store]) memoryCache[store].delete(id);
+}
+async function dbClear(store) {
+  await StorageAdapter.clear(store);
+  if (memoryCache[store]) memoryCache[store].clear();
+}
+async function dbGetByIndex(store, idx, val) {
+  let list = await StorageAdapter.getByIndex(store, idx, val);
+  if (!CryptoVault.isLocked() && SENSITIVE_FIELDS[store]) {
+    list = await Promise.all(list.map(async r => {
+      if (r && r.__encrypted) { try { return await decryptRecord(store, r); } catch (e) { return r; } }
+      return r;
+    }));
+  }
+  return list || [];
+}
+function getDeviceId() {
+  try {
+    let d = localStorage.getItem('artdent_device_id');
+    if (!d) { d = 'dev_' + bytesToHex(randomBytes(8)); localStorage.setItem('artdent_device_id', d); }
+    return d;
+  } catch (e) { return 'dev_' + bytesToHex(randomBytes(8)); }
+}
+
+async function openDatabase() {
+  try {
+    const mode = await StorageAdapter.init();
+    console.log('📦 Storage mode:', mode);
+    if (StorageAdapter.isIndexedDB()) {
+      try { db = await StorageAdapter.openDB(); }
+      catch (e) { console.warn('IndexedDB open failed:', e); db = null; }
+    } else { db = null; }
+    return db;
+  } catch (e) { console.error('openDatabase failed:', e); throw e; }
+}
+
+async function loadSettings() {
+  let s = null;
+  try { s = await dbGet(STORES.settings, 1); } catch (e) {}
+  if (!s) {
+    const salt = randomBytes(16);
+    const { hash } = await hashPassword('admin', bytesToHex(salt));
+    s = { id: 1, app_name: 'ARTDENT', lab_name: 'لابراتوار دندانسازی', icon_data: null, username: 'admin', password_hash: hash, password_salt: bytesToHex(salt), auto_theme: true, dark_mode: false, encryption_enabled: false, encryption_salt: null };
+    try { await dbPut(STORES.settings, s); } catch (e) {}
+  }
+  currentSettings = s;
+  let sm = null;
+  try { sm = await dbGet(STORES.security, 1); } catch (e) {}
+  if (!sm) { sm = { id: 1, idleTimeout: IDLE_TIMEOUT, sessionTimeout: SESSION_TIMEOUT, enforceLock: false, maskSensitive: false }; try { await dbPut(STORES.security, sm); } catch (e) {} }
+  securityMeta = sm;
+  applyBranding();
+  applyAutoTheme();
+  applyDarkMode(s.dark_mode);
+  const el = document.getElementById('autoThemeStatus');
+  if (el) el.textContent = s.auto_theme ? '✓' : '✗';
+  return s;
+}
+function applyBranding() {
+  if (!currentSettings) return;
+  const appName = currentSettings.app_name || 'ARTDENT';
+  const labName = currentSettings.lab_name || '';
+  const el1 = document.getElementById('brandAppName');
+  const el2 = document.getElementById('pageTitle');
+  if (el1) el1.textContent = appName;
+  if (el2) el2.textContent = `${appName} — ثبت خدمات ${labName}`;
+  document.title = `${appName} - حسابداری ${labName}`;
+  if (currentSettings.icon_data) { const img = document.getElementById('brandIcon'); if (img) img.src = currentSettings.icon_data; }
+}
+
+function getAutoTheme() {
+  const t = JalaliDate.today(); const m = t.jm;
+  if (m === 1 && t.jd <= 13) return 'nowruz';
+  if (m >= 1 && m <= 3) return 'spring';
+  if (m >= 4 && m <= 6) return 'summer';
+  if (m >= 7 && m <= 9) return 'autumn';
+  if (m === 9 && t.jd >= 25) return 'yalda';
+  if (m === 10 && t.jd <= 5) return 'yalda';
+  return 'winter';
+}
+function applyAutoTheme() {
+  if (currentSettings?.auto_theme === false) return;
+  const themeName = getAutoTheme();
+  document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+  document.body.classList.add('theme-' + themeName);
+}
+function toggleAutoTheme() {
+  if (!currentSettings) return;
+  currentSettings.auto_theme = !currentSettings.auto_theme;
+  dbPut(STORES.settings, currentSettings).then(() => {
+    const el = document.getElementById('autoThemeStatus');
+    if (el) el.textContent = currentSettings.auto_theme ? '✓' : '✗';
+    if (currentSettings.auto_theme) applyAutoTheme();
+    else { document.body.className = ''; if (currentSettings.dark_mode) document.body.classList.add('theme-dark'); }
+    showToast('تغییر کرد', 'success');
+  });
+}
+function toggleDarkMode() {
+  if (!currentSettings) return;
+  currentSettings.dark_mode = !currentSettings.dark_mode;
+  dbPut(STORES.settings, currentSettings).then(() => { applyDarkMode(currentSettings.dark_mode); showToast('تغییر کرد', 'success'); });
+}
+function applyDarkMode(on) { if (on) document.body.classList.add('theme-dark'); else document.body.classList.remove('theme-dark'); }
+
+function showLoginScreen() {
+  showModal('ورود به سیستم', `
+    <div class="form-group"><label>نام کاربری</label><input type="text" id="loginUser" value="admin" autocomplete="username"></div>
+    <div class="form-group" style="margin-top:10px;"><label>رمز عبور</label><input type="password" id="loginPass" autocomplete="current-password"></div>
+    <p style="color:var(--text-muted); font-size:11px; margin-top:10px; text-align:center;">پیش‌فرض: <strong>admin</strong></p>
+    <p id="loginError" style="color:#c0392b; font-size:12px; text-align:center; margin-top:8px;"></p>
+  `, `<button class="btn" id="loginBtn">ورود</button>`, 'modal-sm');
+  document.getElementById('loginBtn').onclick = tryLogin;
+  document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+  setTimeout(() => document.getElementById('loginPass').focus(), 100);
+}
+async function tryLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  if (!u || !p) return showToast('نام کاربری و رمز را وارد کنید', 'error');
+  try {
+    if (lockoutUntil > Date.now()) {
+      const remaining = Math.ceil((lockoutUntil - Date.now()) / 1000);
+      throw new Error(`به‌دلیل تلاش‌های ناموفق، ${remaining} ثانیه صبر کنید`);
+    }
+    const ok = await verifyPassword(p, currentSettings.password_hash, currentSettings.password_salt);
+    if (u !== currentSettings.username || !ok) {
+      loginAttempts++;
+      if (loginAttempts >= MAX_LOGIN_ATTEMPTS) { lockoutUntil = Date.now() + LOCKOUT_TIME; loginAttempts = 0; await auditLog('login_lockout'); }
+      errEl.textContent = `اطلاعات نادرست (${loginAttempts}/${MAX_LOGIN_ATTEMPTS})`;
+      await auditLog('login_failed');
+      return;
+    }
+    loginAttempts = 0;
+    lockoutUntil = 0;
+    currentUser = u;
+    const el = document.getElementById('currentUser');
+    if (el) el.textContent = u;
+    if (currentSettings.encryption_enabled && currentSettings.encryption_salt) await CryptoVault.unlock(p, currentSettings.encryption_salt);
+    closeModal();
+    document.getElementById('mainContainer').style.display = 'block';
+    document.getElementById('topbar').style.display = 'flex';
+    document.getElementById('menubar').style.display = 'flex';
+    attachIdleListeners();
+    startSessionTimer();
+    await auditLog('login_success');
+    showToast('خوش آمدید!', 'success');
+    await initApp();
+  } catch (e) {
+    errEl.textContent = e.message;
+    await auditLog('login_error', { error: e.message });
+  }
+}
+function logout() {
+  confirmAsync('از سیستم خارج می‌شوید؟').then(async ok => {
+    if (!ok) return;
+    await auditLog('logout');
+    CryptoVault.lock();
+    Object.values(memoryCache).forEach(m => m.clear());
+    location.reload();
+  });
+}
+
+async function initApp() {
+  try {
+    if (Environment.hasBroadcast) { try { syncChannel = new BroadcastChannel('artdent_sync'); } catch (e) {} }
+    setupAutoBackup();
+    await loadDentists();
+    await loadFilterDentistOptions();
+    await renderServices();
+    await updateStats();
+    window.addEventListener('online', () => { const el = document.getElementById('onlineStatus'); if (el) { el.textContent = '🟢 آنلاین'; el.classList.remove('offline'); } });
+    window.addEventListener('offline', () => { const el = document.getElementById('onlineStatus'); if (el) { el.textContent = '🔴 آفلاین'; el.classList.add('offline'); } });
+    if (!navigator.onLine) { const el = document.getElementById('onlineStatus'); if (el) { el.textContent = '🔴 آفلاین'; el.classList.add('offline'); } }
+  } catch (e) { console.error('initApp failed:', e); }
+}
+function setupAutoBackup() {
+  if (autoBackupTimer) clearInterval(autoBackupTimer);
+  autoBackupTimer = setInterval(async () => { try { const d = await buildBackupData(); await saveToAutoBackup(d); } catch (e) {} }, 24 * 60 * 60 * 1000);
+}
+
+async function loadDentists() {
+  const ds = await dbGetAll(STORES.dentists);
+  const sel = document.getElementById('dentistSelect');
+  sel.innerHTML = '<option value="">انتخاب کنید...</option>';
+  ds.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'fa')).forEach(d => { sel.innerHTML += `<option value="${d.id}">${escapeHtml(d.name)}</option>`; });
+  await onDentistChange();
+}
+async function loadFilterDentistOptions() {
+  const ds = await dbGetAll(STORES.dentists);
+  const sel = document.getElementById('filterDentist');
+  sel.innerHTML = '<option value="">همه</option>';
+  ds.forEach(d => { sel.innerHTML += `<option value="${d.id}">${escapeHtml(d.name)}</option>`; });
+}
+async function onDentistChange() {
+  const did = parseInt(document.getElementById('dentistSelect').value) || null;
+  const cs = document.getElementById('clinicSelect');
+  cs.innerHTML = '<option value="">بدون کلینیک</option>';
+  if (did) {
+    try {
+      const cls = await dbGetByIndex(STORES.clinics, 'dentist_id', did);
+      cls.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'fa')).forEach(c => { cs.innerHTML += `<option value="${c.id}">${escapeHtml(c.name)}</option>`; });
+    } catch (e) {}
+  }
+  const ts = document.getElementById('tariffSelect');
+  ts.innerHTML = '<option value="">انتخاب خدمت...</option>';
+  if (did) {
+    try {
+      const trs = await dbGetByIndex(STORES.tariffs, 'dentist_id', did);
+      trs.forEach(t => { ts.innerHTML += `<option value="${t.id}" data-price="${t.price}">${escapeHtml(t.service_name)}</option>`; });
+    } catch (e) {}
+  }
+  document.getElementById('unitPriceInput').value = '';
+  document.getElementById('totalPriceInput').value = '';
+}
+function onTariffChange() {
+  const s = document.getElementById('tariffSelect');
+  const o = s.options[s.selectedIndex];
+  document.getElementById('unitPriceInput').value = o?.dataset?.price ? formatPrice(o.dataset.price) : '';
+  recalcTotal();
+}
+function recalcTotal() {
+  const q = parseInt(toLatinDigits(document.getElementById('qtyInput').value)) || 0;
+  const u = parseNumber(document.getElementById('unitPriceInput').value);
+  document.getElementById('totalPriceInput').value = (q > 0 && u > 0) ? formatPrice(q * u) : '';
+}
+
+async function saveService(isEdit = false) {
+  const did = parseInt(document.getElementById('dentistSelect').value) || null;
+  const cid = parseInt(document.getElementById('clinicSelect').value) || null;
+  const ts = document.getElementById('tariffSelect');
+  const tid = parseInt(ts.value) || null;
+  const sname = ts.options[ts.selectedIndex]?.text || '';
+  const pname = document.getElementById('patientInput').value.trim().substring(0, 100);
+  const dstr = document.getElementById('dateInput').value.trim();
+  const qstr = toLatinDigits(document.getElementById('qtyInput').value).trim();
+  const ustr = toLatinDigits(document.getElementById('unitPriceInput').value).replace(/,/g, '').trim();
+  if (!did) return showToast('دندانپزشک را انتخاب کنید', 'error');
+  if (!tid) return showToast('نوع خدمت را انتخاب کنید', 'error');
+  if (!pname) return showToast('نام بیمار را وارد کنید', 'error');
+  if (!dstr) return showToast('تاریخ را وارد کنید', 'error');
+  const q = parseInt(qstr); if (!q || q <= 0 || q > 100000) return showToast('تعداد معتبر نیست', 'error');
+  const u = parseFloat(ustr); if (!u || u <= 0 || u > 1e12) return showToast('قیمت معتبر نیست', 'error');
+  let iso; try { iso = JalaliDate.jalaliStrToISO(dstr); } catch (e) { return showToast(e.message, 'error'); }
+  const total = q * u;
+  if (!isEdit) {
+    const all = await dbGetAll(STORES.services);
+    const sim = all.filter(s => s.patient_name === pname && s.dentist_id === did && s.service_date === iso);
+    if (sim.length > 0) { const ok = await confirmAsync(`${toPersianDigits(sim.length)} خدمت مشابه وجود دارد. ادامه؟`); if (!ok) return; }
+  }
+  const obj = { patient_name: pname, service_date: iso, service_name: sname, quantity: q, unit_price: u, total_price: total, dentist_id: did, clinic_id: cid, is_paid: isEdit ? (await dbGet(STORES.services, editingServiceId))?.is_paid || 0 : 0, is_included: isEdit ? (await dbGet(STORES.services, editingServiceId))?.is_included ?? 1 : 1, created_at: new Date().toISOString() };
+  try {
+    if (isEdit && editingServiceId) {
+      obj.id = editingServiceId;
+      await dbPut(STORES.services, obj);
+      await auditLog('service_edit', { id: editingServiceId });
+      showToast('ویرایش شد', 'success');
+    } else {
+      const nid = await dbAdd(STORES.services, obj);
+      await auditLog('service_add', { id: nid });
+      showToast(`ثبت شد (${toPersianDigits(nid)})`, 'success');
+    }
+  } catch (e) { return showToast('خطا: ' + e.message, 'error'); }
+  clearForm(); await renderServices(); await updateStats();
+}
+function clearForm() {
+  document.getElementById('dentistSelect').value = '';
+  document.getElementById('clinicSelect').innerHTML = '<option value="">بدون کلینیک</option>';
+  document.getElementById('tariffSelect').innerHTML = '<option value="">انتخاب خدمت...</option>';
+  document.getElementById('patientInput').value = '';
+  const t = JalaliDate.today();
+  document.getElementById('dateInput').value = JalaliDate.format(t.jy, t.jm, t.jd);
+  document.getElementById('qtyInput').value = '';
+  document.getElementById('unitPriceInput').value = '';
+  document.getElementById('totalPriceInput').value = '';
+  editingServiceId = null;
+  document.getElementById('addBtn').style.display = '';
+  document.getElementById('updateBtn').style.display = 'none';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  document.getElementById('formMode').textContent = 'حالت: افزودن';
+}
+function cancelEdit() { clearForm(); selectedServiceIds.clear(); renderServices(); }
+
+async function buildServicesRowsWithNames() {
+  const [all, ds, cs] = await Promise.all([dbGetAll(STORES.services), dbGetAll(STORES.dentists), dbGetAll(STORES.clinics)]);
+  const dm = Object.fromEntries(ds.map(d => [d.id, d.name]));
+  const cm = Object.fromEntries(cs.map(c => [c.id, c.name]));
+  return all.map(s => ({ ...s, dentist_name: dm[s.dentist_id] || '-', clinic_name: cm[s.clinic_id] || '-' }));
+}
+const debouncedRender = debounce(() => renderServices(), 250);
+async function renderServices() {
+  try {
+    const rows0 = await buildServicesRowsWithNames();
+    const q = document.getElementById('quickSearch').value.trim().toLowerCase();
+    const fd = parseInt(document.getElementById('filterDentist').value) || null;
+    const fp = document.getElementById('filterPaid').value;
+    const fi = document.getElementById('filterIncluded').value;
+    let rows = rows0;
+    if (q) rows = rows.filter(r => (r.patient_name||'').toLowerCase().includes(q) || (r.service_name||'').toLowerCase().includes(q) || (r.dentist_name||'').toLowerCase().includes(q));
+    if (fd) rows = rows.filter(r => r.dentist_id === fd);
+    if (fp !== '') rows = rows.filter(r => r.is_paid === parseInt(fp));
+    if (fi !== '') rows = rows.filter(r => r.is_included === parseInt(fi));
+    const [field, dir] = document.getElementById('sortField').value.split('-');
+    rows.sort((a, b) => { let va = a[field], vb = b[field]; if (typeof va === 'string') va = va.toLowerCase(); if (typeof vb === 'string') vb = vb.toLowerCase(); if (va < vb) return dir === 'asc' ? -1 : 1; if (va > vb) return dir === 'asc' ? 1 : -1; return 0; });
+    const tb = document.getElementById('servicesTbody');
+    const isM = window.innerWidth <= 700;
+    const mask = securityMeta?.maskSensitive;
+    const dl = l => isM ? ` data-label="${l}"` : '';
+    const displayName = (n) => mask ? (n ? n[0] + '***' : '') : n;
+    if (rows.length === 0) tb.innerHTML = `<tr><td colspan="13" style="padding:30px;color:var(--text-muted);">رکوردی نیست</td></tr>`;
+    else tb.innerHTML = rows.map(r => {
+      const sel = selectedServiceIds.has(r.id);
+      const cls = !r.is_included ? 'row-hidden' : (r.is_paid ? 'row-paid' : 'row-unpaid');
+      return `<tr class="${cls} ${sel?'selected':''}" data-id="${r.id}">
+        <td${dl('انتخاب')}><input type="checkbox" ${sel?'checked':''} onchange="toggleSelect(${r.id}, this.checked)"></td>
+        <td${dl('شناسه')}>${toPersianDigits(r.id)}</td>
+        <td${dl('بیمار')}>${escapeHtml(displayName(r.patient_name))}</td>
+        <td${dl('تاریخ')}>${JalaliDate.isoToJalaliStr(r.service_date)}</td>
+        <td${dl('خدمت')}>${escapeHtml(r.service_name)}</td>
+        <td${dl('تعداد')}>${toPersianDigits(r.quantity)}</td>
+        <td${dl('واحد')}>${formatPrice(r.unit_price)}</td>
+        <td${dl('کل')}><strong>${formatPrice(r.total_price)}</strong></td>
+        <td${dl('دندانپزشک')}>${escapeHtml(r.dentist_name)}</td>
+        <td${dl('کلینیک')}>${escapeHtml(r.clinic_name)}</td>
+        <td${dl('پرداخت')}>${r.is_paid ? '✓' : '✗'}</td>
+        <td${dl('نمایش')}>${r.is_included ? 'نمایش' : 'مخفی'}</td>
+        <td${dl('عملیات')}><button class="btn btn-sm" onclick="editService(${r.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteService(${r.id})">🗑</button></td>
+      </tr>`;
+    }).join('');
+    document.getElementById('servicesCount').textContent = toPersianDigits(rows.length) + ' رکورد';
+    document.getElementById('tableFooter').textContent = `جمع: ${formatPrice(rows.reduce((s, r) => s + (r.total_price || 0), 0))} تومان`;
+  } catch (e) {}
+}
+function toggleSelect(id, c) { if (c) selectedServiceIds.add(id); else selectedServiceIds.delete(id); renderServices(); }
+function toggleSelectAll(cb) {
+  if (cb.checked) document.querySelectorAll('#servicesTbody input[type="checkbox"]').forEach(c => selectedServiceIds.add(parseInt(c.closest('tr').dataset.id)));
+  else selectedServiceIds.clear();
+  renderServices();
+}
+function selectAllVisible() { toggleSelectAll({ checked: true }); document.getElementById('selectAllCheckbox').checked = true; }
+function clearSelection() { selectedServiceIds.clear(); document.getElementById('selectAllCheckbox').checked = false; renderServices(); }
+async function editService(id) {
+  const s = await dbGet(STORES.services, id); if (!s) return;
+  editingServiceId = id;
+  document.getElementById('dentistSelect').value = s.dentist_id;
+  await onDentistChange();
+  document.getElementById('clinicSelect').value = s.clinic_id || '';
+  document.getElementById('patientInput').value = s.patient_name;
+  document.getElementById('dateInput').value = JalaliDate.isoToJalaliStr(s.service_date);
+  document.getElementById('qtyInput').value = toPersianDigits(s.quantity);
+  document.getElementById('unitPriceInput').value = formatPrice(s.unit_price);
+  document.getElementById('totalPriceInput').value = formatPrice(s.total_price);
+  document.getElementById('addBtn').style.display = 'none';
+  document.getElementById('updateBtn').style.display = '';
+  document.getElementById('cancelEditBtn').style.display = '';
+  document.getElementById('formMode').textContent = `ویرایش (${toPersianDigits(id)})`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+async function deleteService(id) {
+  const ok = await confirmAsync('این خدمت حذف شود؟'); if (!ok) return;
+  await dbDelete(STORES.services, id); await auditLog('service_delete', { id });
+  selectedServiceIds.delete(id); showToast('حذف شد', 'success');
+  await renderServices(); await updateStats();
+}
+async function deleteSelected() {
+  if (!selectedServiceIds.size) return showToast('انتخاب نشده', 'warning');
+  const ok = await confirmAsync(`${toPersianDigits(selectedServiceIds.size)} ردیف حذف شود؟`); if (!ok) return;
+  for (const id of selectedServiceIds) await dbDelete(STORES.services, id);
+  await auditLog('bulk_delete', { count: selectedServiceIds.size });
+  selectedServiceIds.clear(); showToast('حذف شد', 'success');
+  await renderServices(); await updateStats();
+}
+async function togglePaid() {
+  if (!selectedServiceIds.size) return showToast('انتخاب نشده', 'warning');
+  for (const id of selectedServiceIds) { const s = await dbGet(STORES.services, id); if (s) { s.is_paid = s.is_paid ? 0 : 1; await dbPut(STORES.services, s); } }
+  showToast('تغییر یافت', 'success'); await renderServices();
+}
+async function toggleIncluded() {
+  if (!selectedServiceIds.size) return showToast('انتخاب نشده', 'warning');
+  for (const id of selectedServiceIds) { const s = await dbGet(STORES.services, id); if (s) { s.is_included = s.is_included ? 0 : 1; await dbPut(STORES.services, s); } }
+  showToast('تغییر یافت', 'success'); await renderServices();
+}
+async function updateStats() {
+  try {
+    const all = await dbGetAll(STORES.services);
+    const inc = all.filter(s => s.is_included);
+    const total = inc.reduce((s, r) => s + (r.total_price || 0), 0);
+    const paid = inc.filter(r => r.is_paid).reduce((s, r) => s + (r.total_price || 0), 0);
+    const unpaid = total - paid;
+    const patients = new Set(inc.map(r => r.patient_name)).size;
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card"><div class="label">تعداد</div><div class="value">${toPersianDigits(inc.length)}</div></div>
+      <div class="stat-card" style="border-color:#27ae60;"><div class="label">جمع کل</div><div class="value" style="color:#27ae60;">${formatPrice(total)}</div></div>
+      <div class="stat-card" style="border-color:#2c5c8a;"><div class="label">پرداخت‌شده</div><div class="value">${formatPrice(paid)}</div></div>
+      <div class="stat-card" style="border-color:#c0392b;"><div class="label">پرداخت‌نشده</div><div class="value" style="color:#c0392b;">${formatPrice(unpaid)}</div></div>
+      <div class="stat-card" style="border-color:#e67e22;"><div class="label">بیماران</div><div class="value" style="color:#e67e22;">${toPersianDigits(patients)}</div></div>
+    `;
+  } catch (e) {}
+}
+
+async function openSecurityCenter() {
+  const secStatus = SecurityCore.getStatus();
+  const violations = SecurityCore.getViolations();
+  const extensions = ExtensionDetector.detect();
+  const foreign = ExtensionDetector.checkForeignGlobals();
+  const enc = currentSettings?.encryption_enabled;
+  const cryptoMode = CryptoVault.getMode();
+  const devtools = BehaviorMonitor.isDevtoolsOpen();
+  const storageMode = StorageAdapter.getMode();
+  const encMode = enc ? (cryptoMode === 'webcrypto' ? 'AES-GCM سخت‌افزاری' : 'XOR+PBKDF2 (Fallback)') : 'غیرفعال';
+  const storageStatus = storageMode === 'indexeddb' ? 'ok' : (storageMode === 'localstorage' ? 'warn' : 'fail');
+  const storageText = storageMode === 'indexeddb' ? '✅ IndexedDB' : (storageMode === 'localstorage' ? '⚠️ localStorage' : '❌ فقط RAM');
+  
+  function row(icon, name, desc, status, statusText) {
+    return `<div class="sec-row">
+      <div class="sec-icon">${icon}</div>
+      <div><div class="sec-name">${escapeHtml(name)}</div><div class="sec-desc">${escapeHtml(desc)}</div></div>
+      <div class="sec-status ${status}">${escapeHtml(statusText)}</div>
+    </div>`;
+  }
+  
+  let adminAlert = '';
+  if (Environment.level === 'unsafe' || storageMode === 'memory') {
+    adminAlert = `<div style="background:rgba(192,57,43,0.15);border:1px solid #c0392b;border-radius:8px;padding:12px;margin-bottom:14px;color:#c0392b;font-size:13px;">
+      <strong>⛔ هشدار:</strong> امنیت یا ذخیره‌سازی این دستگاه محدود است. برای امنیت کامل، فایل را در HTTPS یا localhost باز کنید.
+    </div>`;
+  } else if (Environment.limitations.length > 0) {
+    adminAlert = `<div style="background:rgba(230,126,34,0.15);border:1px solid #e67e22;border-radius:8px;padding:12px;margin-bottom:14px;color:#e67e22;font-size:13px;">
+      <strong>⚠️ توجه:</strong> این دستگاه ${toPersianDigits(Environment.limitations.length)} محدودیت امنیتی دارد. جزئیات در پایین.
+    </div>`;
+  }
+  
+  const envSection = `
+    <div class="sec-section">
+      <div class="sec-section-header">
+        <span>🌐 محیط اجرا</span>
+        <span style="font-size:11px;background:${Environment.levelColor};color:white;padding:2px 10px;border-radius:10px;">${Environment.levelIcon} ${Environment.levelLabel}</span>
+      </div>
+      <div class="sec-section-body">
+        ${row('🔌', 'پروتکل اتصال', Environment.protocol + '://' + (Environment.hostname || 'local'), Environment.isHttps || Environment.isLocalhost ? 'ok' : (Environment.isLocalFile ? 'warn' : 'fail'), Environment.isHttps ? 'HTTPS ✅' : (Environment.isLocalhost ? 'localhost ✅' : (Environment.isLocalFile ? 'محلی ⚠️' : 'HTTP ❌')))}
+        ${row('🔒', 'Secure Context', 'محیط امن مرورگر', Environment.isSecure ? 'ok' : 'fail', Environment.isSecure ? 'فعال' : 'غیرفعال')}
+        ${row('💾', 'سیستم ذخیره‌سازی', 'IndexedDB یا جایگزین', storageStatus, storageText)}
+        ${row('🌍', 'اتصال شبکه', 'وضعیت اتصال', navigator.onLine ? 'ok' : 'warn', navigator.onLine ? 'آنلاین' : 'آفلاین')}
+      </div>
+    </div>
+  `;
+  
+  const cryptoSection = `
+    <div class="sec-section">
+      <div class="sec-section-header">
+        <span>🔐 رمزنگاری</span>
+        <span style="font-size:11px;background:${Environment.hasCrypto ? '#27ae60' : '#e67e22'};color:white;padding:2px 10px;border-radius:10px;">${Environment.hasCrypto ? 'حداکثری' : 'محدود'}</span>
+      </div>
+      <div class="sec-section-body">
+        ${row('🔑', 'Web Crypto API', 'AES-GCM + PBKDF2 سخت‌افزاری', Environment.hasCrypto ? 'ok' : 'fail', Environment.hasCrypto ? 'در دسترس' : 'نیست')}
+        ${row('🛡', 'رمزنگاری داده', encMode, enc ? (cryptoMode === 'webcrypto' ? 'ok' : 'warn') : 'warn', enc ? (cryptoMode === 'webcrypto' ? '✅ فعال' : '⚠️ Fallback') : '❌ غیرفعال')}
+        ${row('🔢', 'تکرار PBKDF2', 'تعداد تکرار مشتق‌سازی', 'info', toPersianDigits(CryptoVault.getIterations()))}
+        ${row('📊', 'حالت Crypto', 'حالت جاری', 'info', cryptoMode === 'none' ? 'قفل' : (cryptoMode === 'webcrypto' ? 'WebCrypto ✅' : 'Fallback ⚠️'))}
+      </div>
+    </div>
+  `;
+  
+  const layersSection = `
+    <div class="sec-section">
+      <div class="sec-section-header">
+        <span>🛡 لایه‌های امنیتی</span>
+        <span style="font-size:11px;background:rgba(39,174,96,0.2);color:#27ae60;padding:2px 10px;border-radius:10px;">${toPersianDigits([secStatus.frozen, secStatus.domGuard, secStatus.behaviorMonitor, secStatus.integrityGuard].filter(Boolean).length)}/4 فعال</span>
+      </div>
+      <div class="sec-section-body">
+        ${row('❄️', 'Freeze Prototype', 'قفل توابع حیاتی', secStatus.frozen ? 'ok' : 'fail', secStatus.frozen ? '✅' : '❌')}
+        ${row('👁', 'DOM Guard', 'نظارت DOM', secStatus.domGuard ? 'ok' : 'fail', secStatus.domGuard ? '✅' : '❌')}
+        ${row('🔍', 'Integrity Monitor', 'بررسی صحت کد', secStatus.integrityGuard ? 'ok' : 'fail', secStatus.integrityGuard ? '✅' : '❌')}
+        ${row('🎭', 'Behavior Monitor', 'تشخیص رفتار مشکوک', secStatus.behaviorMonitor ? 'ok' : 'fail', secStatus.behaviorMonitor ? '✅' : '❌')}
+        ${row('🔒', 'Auto-Lock', 'قفل خودکار', 'ok', toPersianDigits(Math.round(IDLE_TIMEOUT / 60000)) + ' دقیقه')}
+        ${row('🚫', 'Rate Limiting', 'محدودیت تلاش ورود', 'ok', toPersianDigits(MAX_LOGIN_ATTEMPTS) + ' تلاش')}
+      </div>
+    </div>
+  `;
+  
+  const capSection = `
+    <div class="sec-section">
+      <div class="sec-section-header">
+        <span>⚙️ قابلیت‌های در دسترس</span>
+        <span style="font-size:11px;background:rgba(44,92,138,0.2);color:#2c5c8a;padding:2px 10px;border-radius:10px;">${toPersianDigits(Environment.capabilities.length)}</span>
+      </div>
+      <div class="sec-section-body">
+        ${Environment.capabilities.map(c => row('✅', c.title, c.desc, 'ok', 'دارد')).join('')}
+      </div>
+    </div>
+  `;
+  
+  const limitSection = Environment.limitations.length > 0 ? `
+    <div class="sec-section">
+      <div class="sec-section-header" style="background:rgba(230,126,34,0.15);color:#e67e22;">
+        <span>⚠️ محدودیت‌های دستگاه</span>
+        <span style="font-size:11px;background:#e67e22;color:white;padding:2px 10px;border-radius:10px;">${toPersianDigits(Environment.limitations.length)}</span>
+      </div>
+      <div class="sec-section-body">
+        ${Environment.limitations.map(l => row('⚠️', l.title, l.desc, 'warn', 'محدود')).join('')}
+      </div>
+    </div>
+  ` : '';
+  
+  const threatSection = `
+    <div class="sec-section">
+      <div class="sec-section-header" style="background:rgba(${violations.length || extensions.length || devtools ? '192,57,43' : '39,174,96'},0.1);">
+        <span>🚨 وضعیت تهدیدها</span>
+        <span style="font-size:11px;background:${violations.length || extensions.length || devtools ? '#c0392b' : '#27ae60'};color:white;padding:2px 10px;border-radius:10px;">${violations.length || extensions.length || devtools ? 'هشدار' : 'امن'}</span>
+      </div>
+      <div class="sec-section-body">
+        ${row('🛡', 'تخلفات امنیتی', 'رویدادهای مشکوک', violations.length > 0 ? 'fail' : 'ok', toPersianDigits(violations.length))}
+        ${row('🧩', 'افزونه‌های شناسایی‌شده', extensions.length > 0 ? extensions.join(', ') : 'هیچ', extensions.length > 0 ? 'warn' : 'ok', toPersianDigits(extensions.length))}
+        ${row('🌐', 'متغیرهای غیرعادی', 'متغیرهای مشکوک', foreign.length > 0 ? 'warn' : 'ok', toPersianDigits(foreign.length))}
+        ${row('🔧', 'DevTools', 'ابزار توسعه‌دهنده', devtools ? 'warn' : 'ok', devtools ? 'باز ⚠️' : 'بسته ✅')}
+      </div>
+    </div>
+  `;
+  
+  showModal('🛡 مرکز امنیت', `
+    ${adminAlert}
+    <div style="background:linear-gradient(135deg, ${Environment.levelColor} 0%, ${Environment.levelColor}dd 100%);color:white;border-radius:10px;padding:16px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:6px;">${Environment.levelIcon}</div>
+      <div style="font-size:18px;font-weight:bold;margin-bottom:4px;">سطح امنیت: ${Environment.levelLabel}</div>
+      <div style="font-size:12px;opacity:0.9;">${Environment.summary()}</div>
+    </div>
+    ${envSection}
+    ${cryptoSection}
+    ${layersSection}
+    ${capSection}
+    ${limitSection}
+    ${threatSection}
+    <div style="margin-top:14px;padding:10px;background:rgba(44,92,138,0.05);border-radius:8px;font-size:11px;color:var(--text-muted);text-align:center;">
+      این گزارش فقط در این پنل نمایش داده می‌شود و برای مدیر سیستم است.
+    </div>
+  `, `
+    <button class="btn btn-secondary" onclick="closeModal()">بستن</button>
+    <button class="btn" onclick="forceSecurityScan()">🔎 اسکن</button>
+    <button class="btn btn-success" onclick="exportSecurityReport()">💾 گزارش</button>
+  `, 'modal-lg');
+}
+
+async function forceSecurityScan() {
+  showProgress(true);
+  try {
+    const extensions = ExtensionDetector.detect();
+    const violations = SecurityCore.getViolations();
+    const integrity = await IntegrityGuard.checkIntegrity();
+    await auditLog('manual_scan', { extensions: extensions.length, violations: violations.length });
+    showProgress(false);
+    showToast('اسکن کامل شد', 'success');
+    openSecurityCenter();
+  } catch (e) { showProgress(false); showToast('خطا: ' + e.message, 'error'); }
+}
+
+async function exportSecurityReport() {
+  const secStatus = SecurityCore.getStatus();
+  const report = {
+    generated_at: new Date().toISOString(), app_version: APP_VERSION,
+    environment: { protocol: Environment.protocol, hostname: Environment.hostname, is_secure: Environment.isSecure, has_crypto: Environment.hasCrypto, level: Environment.level, level_label: Environment.levelLabel },
+    storage: { mode: StorageAdapter.getMode() },
+    limitations: Environment.limitations, capabilities: Environment.capabilities,
+    security_layers: secStatus,
+    crypto: { enabled: currentSettings?.encryption_enabled, mode: CryptoVault.getMode(), iterations: CryptoVault.getIterations(), webcrypto_available: Environment.hasCrypto },
+    violations_count: SecurityCore.getViolations().length,
+    extensions_detected: ExtensionDetector.detect(),
+    devtools_open: BehaviorMonitor.isDevtoolsOpen()
+  };
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `artdent_security_${new Date().toISOString().slice(0,10)}.json`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('گزارش ذخیره شد', 'success');
+}
+
+async function openEncryptionSettings() {
+  const enc = currentSettings?.encryption_enabled;
+  const cryptoMode = CryptoVault.getMode();
+  showModal('🔐 رمزنگاری داده', `
+    <div style="font-size:13px;line-height:1.9;">
+      <p style="margin-bottom:14px;">رمزنگاری روی <strong>فیلدهای حساس</strong> اعمال می‌شود.</p>
+      ${Environment.hasCrypto ? `<p style="margin-bottom:14px;color:#27ae60;">✅ Web Crypto API در دسترس است — AES-GCM سخت‌افزاری.</p>` : `<p style="margin-bottom:14px;color:#e67e22;">⚠️ Web Crypto نیست — Fallback استفاده می‌شود.</p>`}
+      <p style="margin-bottom:14px;color:#c0392b;font-weight:bold;">⚠️ اگر رمز را فراموش کنید، داده‌ها غیرقابل بازیابی می‌شوند.</p>
+      <p style="margin-bottom:14px;">وضعیت: <strong style="color:${enc ? '#27ae60' : '#c0392b'};">${enc ? '✅ فعال' : '❌ غیرفعال'}</strong></p>
+      <p style="margin-bottom:14px;">حالت: <strong>${cryptoMode === 'webcrypto' ? 'AES-GCM' : (cryptoMode === 'fallback' ? 'XOR+PBKDF2' : 'غیرفعال')}</strong></p>
+      ${enc ? `<button class="btn btn-warning" onclick="disableEncryption()">🔓 غیرفعال</button>` : `<button class="btn btn-success" onclick="enableEncryption()">🔐 فعال</button>`}
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-sm');
+}
+async function enableEncryption() {
+  const pwd = await promptAsync('رمز رمزنگاری', 'حداقل ۸ کاراکتر');
+  if (!pwd || pwd.length < 8) return showToast('رمز حداقل ۸ کاراکتر', 'error');
+  const confirmPwd = await promptAsync('تکرار رمز', 'همان رمز');
+  if (confirmPwd !== pwd) return showToast('رمز یکسان نیست', 'error');
+  const ok = await confirmAsync('هشدار: اگر رمز را فراموش کنید، داده‌ها از بین می‌روند. ادامه؟'); if (!ok) return;
+  showProgress(true);
+  try {
+    const salt = randomBytes(16);
+    await CryptoVault.unlock(pwd, bytesToHex(salt));
+    currentSettings.encryption_enabled = true;
+    currentSettings.encryption_salt = bytesToHex(salt);
+    await dbPut(STORES.settings, currentSettings);
+    for (const [store] of Object.entries(SENSITIVE_FIELDS)) {
+      const all = await dbGetAll(store);
+      for (const rec of all) {
+        if (rec.__encrypted) continue;
+        const encrypted = await encryptRecord(store, rec);
+        await StorageAdapter.put(store, encrypted);
+      }
+    }
+    await auditLog('encryption_enabled');
+    showProgress(false); closeModal();
+    showToast('رمزنگاری فعال شد', 'success');
+    setTimeout(() => location.reload(), 1500);
+  } catch (e) { showProgress(false); showToast('خطا: ' + e.message, 'error'); }
+}
+async function disableEncryption() {
+  const pwd = await promptAsync('رمز فعلی', '');
+  if (!pwd) return;
+  const ok = await verifyPassword(pwd, currentSettings.password_hash, currentSettings.password_salt);
+  if (!ok) return showToast('رمز نادرست', 'error');
+  const confirm = await confirmAsync('داده‌ها از رمزنگاری خارج می‌شوند. ادامه؟'); if (!confirm) return;
+  showProgress(true);
+  try {
+    for (const [store] of Object.entries(SENSITIVE_FIELDS)) {
+      const all = await dbGetAll(store);
+      for (const rec of all) {
+        if (!rec.__encrypted) continue;
+        const decrypted = await decryptRecord(store, rec);
+        await StorageAdapter.put(store, decrypted);
+      }
+    }
+    currentSettings.encryption_enabled = false;
+    currentSettings.encryption_salt = null;
+    await dbPut(STORES.settings, currentSettings);
+    CryptoVault.lock();
+    await auditLog('encryption_disabled');
+    showProgress(false); closeModal(); showToast('غیرفعال شد', 'success');
+  } catch (e) { showProgress(false); showToast('خطا: ' + e.message, 'error'); }
+}
+function promptAsync(title, placeholder = '') {
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.className = 'modal-overlay active'; ov.style.zIndex = '6000';
+    ov.innerHTML = `<div class="modal modal-sm">
+      <div class="modal-header"><h3>${escapeHtml(title)}</h3></div>
+      <div class="modal-body"><div class="form-group"><input type="password" id="promptInput" placeholder="${escapeHtml(placeholder)}"></div></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="promptCancel">انصراف</button>
+        <button class="btn" id="promptOk">تأیید</button>
+      </div></div>`;
+    DOMGuard.markOwn(ov);
+    document.body.appendChild(ov);
+    const input = ov.querySelector('#promptInput');
+    setTimeout(() => input.focus(), 100);
+    const close = (val) => { ov.remove(); resolve(val); };
+    ov.querySelector('#promptOk').onclick = () => close(input.value);
+    ov.querySelector('#promptCancel').onclick = () => close(null);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') close(input.value); });
+  });
+}
+
+async function openAuditLog() {
+  const log = (await dbGetAll(STORES.audit)).sort((a, b) => b.ts - a.ts).slice(0, 200);
+  const rows = log.map(l => `<tr>
+    <td>${new Date(l.ts).toLocaleString('fa-IR')}</td>
+    <td>${escapeHtml(l.action)}</td>
+    <td>${escapeHtml(l.user)}</td>
+    <td style="font-size:10px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(l.details)}</td>
+  </tr>`).join('');
+  showModal('📋 لاگ فعالیت‌ها', `
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>زمان</th><th>عملیات</th><th>کاربر</th><th>جزئیات</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="4">خالی</td></tr>'}</tbody>
+    </table></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button><button class="btn btn-warning" onclick="clearAuditLog()">🗑 پاک</button>`, 'modal-lg');
+}
+async function clearAuditLog() {
+  const ok = await confirmAsync('کل لاگ پاک شود؟'); if (!ok) return;
+  await dbClear(STORES.audit);
+  showToast('پاک شد', 'success'); closeModal();
+}
+
+async function openSessionSettings() {
+  const s = securityMeta || {};
+  showModal('⏱ تنظیمات نشست', `
+    <div class="form-group"><label>قفل خودکار (دقیقه)</label><input type="number" id="sessionIdle" value="${Math.round((s.idleTimeout || IDLE_TIMEOUT) / 60000)}" min="1" max="120"></div>
+    <div class="form-group" style="margin-top:10px;"><label>انقضای نشست (دقیقه)</label><input type="number" id="sessionAbs" value="${Math.round((s.sessionTimeout || SESSION_TIMEOUT) / 60000)}" min="5" max="480"></div>
+    <div class="form-group" style="margin-top:10px;"><label><input type="checkbox" id="sessionMask" ${s.maskSensitive ? 'checked' : ''}> مخفی کردن نام بیماران</label></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveSessionSettings()">💾</button>`, 'modal-sm');
+}
+async function saveSessionSettings() {
+  securityMeta = securityMeta || { id: 1 };
+  securityMeta.idleTimeout = Math.max(1, parseInt(document.getElementById('sessionIdle').value) || 10) * 60000;
+  securityMeta.sessionTimeout = Math.max(5, parseInt(document.getElementById('sessionAbs').value) || 30) * 60000;
+  securityMeta.maskSensitive = document.getElementById('sessionMask').checked;
+  await dbPut(STORES.security, securityMeta);
+  closeModal(); showToast('ذخیره شد', 'success'); await renderServices();
+}
+
+async function backupEncrypted() {
+  const pwd = await promptAsync('رمز بکاپ', 'حداقل ۸ کاراکتر');
+  if (!pwd || pwd.length < 8) return showToast('رمز حداقل ۸ کاراکتر', 'error');
+  showProgress(true);
+  try {
+    const data = await buildBackupData();
+    const encrypted = await CryptoVault.encryptWithPassword(data, pwd);
+    const payload = { version: 1, type: 'artdent_encrypted_backup', salt: encrypted.salt, iv: encrypted.iv, ct: encrypted.ct, meta: { created: Date.now(), app: 'ARTDENT', v: APP_VERSION } };
+    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `artdent_secure_${new Date().toISOString().slice(0,10)}.artdent`; a.click();
+    URL.revokeObjectURL(url);
+    await auditLog('backup_encrypted');
+    showToast('بکاپ ذخیره شد', 'success');
+  } catch (e) { showToast('خطا: ' + e.message, 'error'); }
+  finally { showProgress(false); }
+}
+async function restoreEncrypted() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.artdent,.json';
+  input.onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    if (f.size > 100 * 1024 * 1024) return showToast('فایل بزرگ', 'error');
+    const pwd = await promptAsync('رمز فایل', ''); if (!pwd) return;
+    showProgress(true);
+    try {
+      const payload = JSON.parse(await f.text());
+      if (payload.type !== 'artdent_encrypted_backup') return showToast('فایل نامعتبر', 'error');
+      const data = await CryptoVault.decryptWithPassword(payload, pwd);
+      const ok = await confirmAsync('داده‌ها جایگزین می‌شوند. ادامه؟'); if (!ok) return;
+      await restoreFromData(data);
+      await auditLog('restore_encrypted');
+      showToast('بازیابی موفق', 'success');
+      setTimeout(() => location.reload(), 1500);
+    } catch (e) { showToast('خطا: ' + e.message, 'error'); }
+    finally { showProgress(false); }
+  };
+  input.click();
+}
+async function backupDatabase() {
+  showProgress(true);
+  try {
+    const data = await buildBackupData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `artdent_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+    URL.revokeObjectURL(url);
+    await auditLog('backup_plain');
+    showToast('بکاپ ساده ذخیره شد', 'warning');
+  } catch (e) { showToast('خطا: ' + e.message, 'error'); }
+  finally { showProgress(false); }
+}
+async function buildBackupData() {
+  const stores = [STORES.dentists, STORES.clinics, STORES.tariffs, STORES.services, STORES.referrals, STORES.settings, STORES.templates];
+  const results = await Promise.all(stores.map(s => dbGetAll(s).catch(() => [])));
+  const data = { _meta: { version: DB_VERSION, exported_at: new Date().toISOString(), device_id: getDeviceId(), app: 'ARTDENT', v: APP_VERSION, storage: StorageAdapter.getMode() } };
+  stores.forEach((s, i) => { data[s] = results[i]; });
+  return data;
+}
+async function saveToAutoBackup(data) {
+  try {
+    const all = (await dbGetAll(STORES.meta)).filter(b => b.key && b.key.startsWith('backup_'));
+    all.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+    for (let i = 5; i < all.length; i++) await dbDelete(STORES.meta, all[i].key);
+    const key = 'backup_' + Date.now();
+    await dbPut(STORES.meta, { key, created_at: Date.now(), data: JSON.stringify(data) });
+  } catch (e) {}
+}
+async function manageAutoBackups() {
+  const backups = (await dbGetAll(STORES.meta)).filter(b => b.key && b.key.startsWith('backup_')).sort((a, b) => b.created_at - a.created_at);
+  const rows = backups.map(b => `<tr>
+    <td>${new Date(b.created_at).toLocaleString('fa-IR')}</td>
+    <td>${toPersianDigits(Math.round((b.data||'').length / 1024))} KB</td>
+    <td>
+      <button class="btn btn-sm" onclick="restoreAutoBackup('${b.key}')">📥</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteAutoBackup('${b.key}')">🗑</button>
+    </td></tr>`).join('');
+  showModal('پشتیبان‌های خودکار', `
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>تاریخ</th><th>حجم</th><th>عملیات</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="3">خالی</td></tr>'}</tbody>
+    </table></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+async function restoreAutoBackup(key) {
+  const e = await dbGet(STORES.meta, key); if (!e) return;
+  const ok = await confirmAsync('داده‌ها جایگزین می‌شوند. ادامه؟'); if (!ok) return;
+  await restoreFromData(JSON.parse(e.data));
+  showToast('بازیابی شد', 'success'); closeModal(); setTimeout(() => location.reload(), 1000);
+}
+async function deleteAutoBackup(key) {
+  const ok = await confirmAsync('حذف شود؟'); if (!ok) return;
+  await dbDelete(STORES.meta, key); await manageAutoBackups();
+}
+async function restoreFromData(data) {
+  for (const [store, items] of Object.entries(data)) {
+    if (store.startsWith('_')) continue;
+    if (!STORES[store]) continue;
+    if (store === 'settings') { if (items && items[0]) await dbPut(STORES.settings, items[0]); continue; }
+    await dbClear(store);
+    for (const item of items || []) await StorageAdapter.put(store, item);
+  }
+  Object.values(memoryCache).forEach(m => m.clear());
+}
+
+async function openDentistDialog() {
+  const ds = await dbGetAll(STORES.dentists);
+  const rows = ds.map(d => `<tr><td>${toPersianDigits(d.id)}</td><td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.phone||'')}</td><td>${escapeHtml(d.email||'')}</td><td>${escapeHtml(d.address||'')}</td><td><button class="btn btn-sm" onclick="editDentist(${d.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteDentist(${d.id})">🗑</button></td></tr>`).join('');
+  showModal('مدیریت دندانپزشکان', `
+    <div class="card" style="box-shadow:none;border:1px solid var(--border);">
+      <div class="form-grid">
+        <div class="form-group"><label>نام *</label><input id="dName" maxlength="100"></div>
+        <div class="form-group"><label>تلفن</label><input id="dPhone" maxlength="20"></div>
+        <div class="form-group"><label>ایمیل</label><input id="dEmail" maxlength="100"></div>
+        <div class="form-group"><label>آدرس</label><input id="dAddress" maxlength="200"></div>
+      </div>
+      <input type="hidden" id="dId">
+      <div class="btn-row"><button class="btn" id="dSaveBtn" onclick="saveDentist()">➕ افزودن</button><button class="btn btn-secondary" onclick="clearDentistForm()">🔄</button></div>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data-table"><thead><tr><th>شناسه</th><th>نام</th><th>تلفن</th><th>ایمیل</th><th>آدرس</th><th>عملیات</th></tr></thead><tbody>${rows || '<tr><td colspan="6">خالی</td></tr>'}</tbody></table>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+async function saveDentist() {
+  const id = document.getElementById('dId').value;
+  const name = document.getElementById('dName').value.trim();
+  if (!name) return showToast('نام خالی', 'error');
+  const o = { name, phone: document.getElementById('dPhone').value.trim(), email: document.getElementById('dEmail').value.trim(), address: document.getElementById('dAddress').value.trim() };
+  if (id) { o.id = +id; await dbPut(STORES.dentists, o); } else await dbAdd(STORES.dentists, o);
+  await auditLog(id ? 'dentist_edit' : 'dentist_add');
+  showToast('ذخیره شد', 'success');
+  await loadDentists(); await loadFilterDentistOptions(); await openDentistDialog();
+}
+async function editDentist(id) {
+  const d = await dbGet(STORES.dentists, id); if (!d) return;
+  document.getElementById('dId').value = d.id; document.getElementById('dName').value = d.name;
+  document.getElementById('dPhone').value = d.phone || ''; document.getElementById('dEmail').value = d.email || '';
+  document.getElementById('dAddress').value = d.address || '';
+  document.getElementById('dSaveBtn').textContent = '✏️ ذخیره';
+}
+function clearDentistForm() { ['dId','dName','dPhone','dEmail','dAddress'].forEach(i => document.getElementById(i).value = ''); document.getElementById('dSaveBtn').textContent = '➕ افزودن'; }
+async function deleteDentist(id) {
+  const ok = await confirmAsync('حذف شود؟'); if (!ok) return;
+  await dbDelete(STORES.dentists, id);
+  try {
+    for (const c of await dbGetByIndex(STORES.clinics, 'dentist_id', id)) await dbDelete(STORES.clinics, c.id);
+    for (const t of await dbGetByIndex(STORES.tariffs, 'dentist_id', id)) await dbDelete(STORES.tariffs, t.id);
+  } catch (e) {}
+  await auditLog('dentist_delete');
+  showToast('حذف شد', 'success');
+  await loadDentists(); await loadFilterDentistOptions(); await openDentistDialog();
+}
+
+async function openClinicDialog() {
+  const [ds, cs] = await Promise.all([dbGetAll(STORES.dentists), dbGetAll(STORES.clinics)]);
+  const dm = Object.fromEntries(ds.map(d => [d.id, d.name]));
+  const rows = cs.map(c => `<tr><td>${toPersianDigits(c.id)}</td><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.phone||'')}</td><td>${escapeHtml(c.address||'')}</td><td>${escapeHtml(dm[c.dentist_id]||'-')}</td><td><button class="btn btn-sm" onclick="editClinic(${c.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteClinic(${c.id})">🗑</button></td></tr>`).join('');
+  const dOpts = ds.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
+  showModal('مدیریت کلینیک‌ها', `
+    <div class="card" style="box-shadow:none;border:1px solid var(--border);">
+      <div class="form-grid">
+        <div class="form-group"><label>دندانپزشک *</label><select id="cDentist">${dOpts}</select></div>
+        <div class="form-group"><label>نام *</label><input id="cName" maxlength="100"></div>
+        <div class="form-group"><label>تلفن</label><input id="cPhone" maxlength="20"></div>
+        <div class="form-group"><label>آدرس</label><input id="cAddress" maxlength="200"></div>
+      </div>
+      <input type="hidden" id="cId">
+      <div class="btn-row"><button class="btn" id="cSaveBtn" onclick="saveClinic()">➕ افزودن</button><button class="btn btn-secondary" onclick="clearClinicForm()">🔄</button></div>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data-table"><thead><tr><th>شناسه</th><th>نام</th><th>تلفن</th><th>آدرس</th><th>دندانپزشک</th><th>عملیات</th></tr></thead><tbody>${rows || '<tr><td colspan="6">خالی</td></tr>'}</tbody></table>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+async function saveClinic() {
+  const id = document.getElementById('cId').value;
+  const did = parseInt(document.getElementById('cDentist').value);
+  const name = document.getElementById('cName').value.trim();
+  if (!did || !name) return showToast('اطلاعات کامل نیست', 'error');
+  const o = { dentist_id: did, name, phone: document.getElementById('cPhone').value.trim(), address: document.getElementById('cAddress').value.trim() };
+  if (id) { o.id = +id; await dbPut(STORES.clinics, o); } else await dbAdd(STORES.clinics, o);
+  await auditLog(id ? 'clinic_edit' : 'clinic_add');
+  showToast('ذخیره شد', 'success'); await onDentistChange(); await openClinicDialog();
+}
+async function editClinic(id) {
+  const c = await dbGet(STORES.clinics, id); if (!c) return;
+  document.getElementById('cId').value = c.id; document.getElementById('cDentist').value = c.dentist_id;
+  document.getElementById('cName').value = c.name; document.getElementById('cPhone').value = c.phone || '';
+  document.getElementById('cAddress').value = c.address || '';
+  document.getElementById('cSaveBtn').textContent = '✏️';
+}
+function clearClinicForm() { ['cId','cName','cPhone','cAddress'].forEach(i => document.getElementById(i).value = ''); document.getElementById('cSaveBtn').textContent = '➕ افزودن'; }
+async function deleteClinic(id) { const ok = await confirmAsync('حذف شود؟'); if (!ok) return; await dbDelete(STORES.clinics, id); await auditLog('clinic_delete'); showToast('حذف شد', 'success'); await openClinicDialog(); }
+
+async function openTariffDialog() {
+  const [ds, ts] = await Promise.all([dbGetAll(STORES.dentists), dbGetAll(STORES.tariffs)]);
+  const dm = Object.fromEntries(ds.map(d => [d.id, d.name]));
+  const rows = ts.map(t => `<tr><td>${toPersianDigits(t.id)}</td><td>${escapeHtml(dm[t.dentist_id]||'-')}</td><td>${escapeHtml(t.service_name)}</td><td>${formatPrice(t.price)}</td><td><button class="btn btn-sm" onclick="editTariff(${t.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteTariff(${t.id})">🗑</button></td></tr>`).join('');
+  const dOpts = ds.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
+  showModal('مدیریت تعرفه‌ها', `
+    <div class="card" style="box-shadow:none;border:1px solid var(--border);">
+      <div class="form-grid">
+        <div class="form-group"><label>دندانپزشک *</label><select id="tDentist">${dOpts}</select></div>
+        <div class="form-group"><label>نام خدمت *</label><input id="tName" maxlength="100"></div>
+        <div class="form-group"><label>قیمت *</label><input id="tPrice" inputmode="numeric" maxlength="15"></div>
+      </div>
+      <input type="hidden" id="tId">
+      <div class="btn-row"><button class="btn" id="tSaveBtn" onclick="saveTariff()">➕ افزودن</button><button class="btn btn-secondary" onclick="clearTariffForm()">🔄</button></div>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data-table"><thead><tr><th>شناسه</th><th>دندانپزشک</th><th>نام خدمت</th><th>قیمت</th><th>عملیات</th></tr></thead><tbody>${rows || '<tr><td colspan="5">خالی</td></tr>'}</tbody></table>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+async function saveTariff() {
+  const id = document.getElementById('tId').value;
+  const did = parseInt(document.getElementById('tDentist').value);
+  const name = document.getElementById('tName').value.trim();
+  const price = parseNumber(document.getElementById('tPrice').value);
+  if (!did || !name || price <= 0) return showToast('اطلاعات کامل نیست', 'error');
+  const all = await dbGetByIndex(STORES.tariffs, 'dentist_id', did);
+  const dup = all.find(t => t.service_name === name && (!id || t.id !== +id));
+  if (dup) return showToast('تکراری', 'error');
+  const o = { dentist_id: did, service_name: name, price };
+  if (id) { o.id = +id; await dbPut(STORES.tariffs, o); } else await dbAdd(STORES.tariffs, o);
+  await auditLog(id ? 'tariff_edit' : 'tariff_add');
+  showToast('ذخیره شد', 'success'); await openTariffDialog();
+}
+async function editTariff(id) {
+  const t = await dbGet(STORES.tariffs, id); if (!t) return;
+  document.getElementById('tId').value = t.id; document.getElementById('tDentist').value = t.dentist_id;
+  document.getElementById('tName').value = t.service_name; document.getElementById('tPrice').value = formatPrice(t.price);
+  document.getElementById('tSaveBtn').textContent = '✏️';
+}
+function clearTariffForm() { ['tId','tName','tPrice'].forEach(i => document.getElementById(i).value = ''); document.getElementById('tSaveBtn').textContent = '➕ افزودن'; }
+async function deleteTariff(id) { const ok = await confirmAsync('حذف شود؟'); if (!ok) return; await dbDelete(STORES.tariffs, id); await auditLog('tariff_delete'); showToast('حذف شد', 'success'); await openTariffDialog(); }
+
+async function openSummaryDialog() {
+  const [ds, ss] = await Promise.all([dbGetAll(STORES.dentists), dbGetAll(STORES.services)]);
+  const inc = ss.filter(s => s.is_included);
+  const rows = ds.map(d => {
+    const dss = inc.filter(s => s.dentist_id === d.id);
+    const t = dss.reduce((s, r) => s + (r.total_price || 0), 0);
+    const p = dss.filter(r => r.is_paid).reduce((s, r) => s + (r.total_price || 0), 0);
+    return `<tr><td>${escapeHtml(d.name)}</td><td>${toPersianDigits(dss.length)}</td><td>${formatPrice(t)}</td><td style="color:#27ae60;">${formatPrice(p)}</td><td style="color:#c0392b;">${formatPrice(t-p)}</td></tr>`;
+  }).join('');
+  const gt = inc.reduce((s, r) => s + (r.total_price || 0), 0);
+  showModal('خلاصه مالی', `
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>دندانپزشک</th><th>تعداد</th><th>جمع</th><th>پرداخت‌شده</th><th>باقی</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="5">خالی</td></tr>'}</tbody>
+      <tfoot><tr style="background:rgba(44,92,138,0.1);font-weight:bold;"><td colspan="2">جمع کل</td><td colspan="3">${formatPrice(gt)}</td></tr></tfoot>
+    </table></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+
+async function openReferralDialog() {
+  const [ds, rs] = await Promise.all([dbGetAll(STORES.dentists), dbGetAll(STORES.referrals)]);
+  const dm = Object.fromEntries(ds.map(d => [d.id, d.name]));
+  const rows = rs.sort((a, b) => (b.referral_date||'').localeCompare(a.referral_date||'')).map(r => `<tr><td>${toPersianDigits(r.id)}</td><td>${escapeHtml(r.patient_name)}</td><td>${escapeHtml(r.referred_lab_name)}</td><td>${escapeHtml(dm[r.dentist_id]||'-')}</td><td>${escapeHtml(r.service_name||'-')}</td><td>${JalaliDate.isoToJalaliStr(r.referral_date)}</td><td>${formatPrice(r.cost)}</td><td><button class="btn btn-sm" onclick="editReferral(${r.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteReferral(${r.id})">🗑</button></td></tr>`).join('');
+  const dOpts = '<option value="">بدون</option>' + ds.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
+  const today = JalaliDate.today();
+  showModal('ارجاع', `
+    <div class="card" style="box-shadow:none;border:1px solid var(--border);">
+      <div class="form-grid">
+        <div class="form-group"><label>نام بیمار *</label><input id="rPatient" maxlength="100"></div>
+        <div class="form-group"><label>لابراتوار *</label><input id="rLab" maxlength="100"></div>
+        <div class="form-group"><label>دندانپزشک</label><select id="rDentist">${dOpts}</select></div>
+        <div class="form-group"><label>خدمت</label><input id="rService" maxlength="100"></div>
+        <div class="form-group"><label>تاریخ *</label><input id="rDate" value="${JalaliDate.format(today.jy, today.jm, today.jd)}" readonly onclick="openJalaliPicker(this)" style="cursor:pointer;"></div>
+        <div class="form-group"><label>هزینه</label><input id="rCost" inputmode="numeric" maxlength="15"></div>
+        <div class="form-group" style="grid-column:1/-1;"><label>توضیحات</label><input id="rNotes" maxlength="200"></div>
+        <div class="form-group"><label><input type="checkbox" id="rReturned"> بازگشته</label></div>
+      </div>
+      <input type="hidden" id="rId">
+      <div class="btn-row"><button class="btn" id="rSaveBtn" onclick="saveReferral()">➕ افزودن</button><button class="btn btn-secondary" onclick="clearReferralForm()">🔄</button></div>
+    </div>
+    <div class="table-wrap" style="margin-top:16px;">
+      <table class="data-table"><thead><tr><th>شناسه</th><th>بیمار</th><th>لابراتوار</th><th>دندانپزشک</th><th>خدمت</th><th>تاریخ</th><th>هزینه</th><th>عملیات</th></tr></thead><tbody>${rows || '<tr><td colspan="8">خالی</td></tr>'}</tbody></table>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+async function saveReferral() {
+  const id = document.getElementById('rId').value;
+  const pn = document.getElementById('rPatient').value.trim();
+  const rl = document.getElementById('rLab').value.trim();
+  const did = parseInt(document.getElementById('rDentist').value) || null;
+  const sn = document.getElementById('rService').value.trim();
+  const ds = document.getElementById('rDate').value.trim();
+  const cost = parseNumber(document.getElementById('rCost').value);
+  const notes = document.getElementById('rNotes').value.trim();
+  const ret = document.getElementById('rReturned').checked ? 1 : 0;
+  if (!pn || !rl) return showToast('نام بیمار و لابراتوار الزامی', 'error');
+  let iso; try { iso = JalaliDate.jalaliStrToISO(ds); } catch (e) { return showToast(e.message, 'error'); }
+  const o = { patient_name: pn, referred_lab_name: rl, service_name: sn, referral_date: iso, cost, dentist_id: did, notes, is_returned: ret };
+  if (id) { o.id = +id; await dbPut(STORES.referrals, o); } else await dbAdd(STORES.referrals, o);
+  await auditLog(id ? 'referral_edit' : 'referral_add');
+  showToast('ذخیره شد', 'success'); await openReferralDialog();
+}
+async function editReferral(id) {
+  const r = await dbGet(STORES.referrals, id); if (!r) return;
+  document.getElementById('rId').value = r.id; document.getElementById('rPatient').value = r.patient_name;
+  document.getElementById('rLab').value = r.referred_lab_name; document.getElementById('rDentist').value = r.dentist_id || '';
+  document.getElementById('rService').value = r.service_name || ''; document.getElementById('rDate').value = JalaliDate.isoToJalaliStr(r.referral_date);
+  document.getElementById('rCost').value = formatPrice(r.cost); document.getElementById('rNotes').value = r.notes || '';
+  document.getElementById('rReturned').checked = !!r.is_returned; document.getElementById('rSaveBtn').textContent = '✏️';
+}
+function clearReferralForm() { ['rId','rPatient','rLab','rService','rCost','rNotes'].forEach(i => document.getElementById(i).value = ''); document.getElementById('rReturned').checked = false; document.getElementById('rSaveBtn').textContent = '➕ افزودن'; }
+async function deleteReferral(id) { const ok = await confirmAsync('حذف شود؟'); if (!ok) return; await dbDelete(STORES.referrals, id); await auditLog('referral_delete'); showToast('حذف شد', 'success'); await openReferralDialog(); }
+
+async function openBrandingDialog() {
+  const s = currentSettings || {};
+  showModal('تنظیمات نام و ظاهر', `
+    <div class="form-group"><label>نام برنامه</label><input id="setAppName" value="${escapeHtml(s.app_name || 'ARTDENT')}" maxlength="50"></div>
+    <div class="form-group" style="margin-top:10px;"><label>نام لابراتوار</label><input id="setLabName" value="${escapeHtml(s.lab_name || '')}" maxlength="100"></div>
+    <div class="form-group" style="margin-top:10px;"><label>آیکون</label><input type="file" id="setIconFile" accept="image/*" onchange="previewIcon(this)"><div style="margin-top:8px;"><img id="setIconPreview" src="${s.icon_data || ''}" style="max-height:60px; ${s.icon_data ? '' : 'display:none;'}"></div></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveBranding()">💾</button>`, 'modal-sm');
+}
+function previewIcon(input) {
+  const f = input.files[0]; if (!f) return;
+  if (f.size > 1024 * 1024) return showToast('حجم < ۱MB', 'error');
+  const r = new FileReader();
+  r.onload = () => { const i = document.getElementById('setIconPreview'); i.src = r.result; i.style.display = 'block'; i.dataset.newData = r.result; };
+  r.readAsDataURL(f);
+}
+async function saveBranding() {
+  currentSettings.app_name = document.getElementById('setAppName').value.trim().substring(0, 50) || 'ARTDENT';
+  currentSettings.lab_name = document.getElementById('setLabName').value.trim().substring(0, 100) || 'لابراتوار دندانسازی';
+  const img = document.getElementById('setIconPreview');
+  currentSettings.icon_data = img.dataset.newData || currentSettings.icon_data || null;
+  await dbPut(STORES.settings, currentSettings);
+  applyBranding(); closeModal(); await auditLog('branding_update'); showToast('ذخیره شد', 'success');
+}
+async function openChangeCredentials() {
+  showModal('تغییر اطلاعات ورود', `
+    <div class="form-group"><label>رمز فعلی *</label><input type="password" id="credCurrent"></div>
+    <div class="form-group" style="margin-top:10px;"><label>نام کاربری جدید *</label><input id="credUser" value="${escapeHtml(currentSettings.username)}" maxlength="50"></div>
+    <div class="form-group" style="margin-top:10px;"><label>رمز جدید *</label><input type="password" id="credNew"></div>
+    <div class="password-strength" id="credStrength"><div class="bar"></div></div>
+    <div class="form-group" style="margin-top:10px;"><label>تکرار *</label><input type="password" id="credConfirm"></div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">حداقل ۸ کاراکتر با حرف بزرگ، کوچک و عدد</div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveCredentials()">💾</button>`, 'modal-sm');
+  document.getElementById('credNew').addEventListener('input', function() { checkPasswordStrength(this.value, 'credStrength'); });
+}
+function checkPasswordStrength(pwd, barId) {
+  const bar = document.querySelector(`#${barId} .bar`); if (!bar) return;
+  let score = 0;
+  if (pwd.length >= 8) score++;
+  if (pwd.length >= 12) score++;
+  if (/[a-z]/.test(pwd)) score++;
+  if (/[A-Z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd)) score++;
+  bar.className = 'bar';
+  if (score <= 2) bar.classList.add('weak');
+  else if (score <= 4) bar.classList.add('medium');
+  else bar.classList.add('strong');
+}
+function isValidPassword(pwd) {
+  if (!pwd || pwd.length < 8) return false;
+  if (!/[a-z]/.test(pwd)) return false;
+  if (!/[A-Z]/.test(pwd)) return false;
+  if (!/[0-9]/.test(pwd)) return false;
+  return true;
+}
+async function saveCredentials() {
+  const cur = document.getElementById('credCurrent').value;
+  const u = document.getElementById('credUser').value.trim().substring(0, 50);
+  const n = document.getElementById('credNew').value;
+  const c = document.getElementById('credConfirm').value;
+  if (!cur || !u || !n) return showToast('اطلاعات کامل نیست', 'error');
+  const ch = await verifyPassword(cur, currentSettings.password_hash, currentSettings.password_salt);
+  if (!ch) { await auditLog('password_change_failed'); return showToast('رمز فعلی نادرست', 'error'); }
+  if (n !== c) return showToast('رمز جدید یکسان نیست', 'error');
+  if (!isValidPassword(n)) return showToast('رمز باید ۸+ با حرف بزرگ/کوچک/عدد', 'error');
+  const { hash, salt } = await hashPassword(n);
+  currentSettings.username = u;
+  currentSettings.password_hash = hash;
+  currentSettings.password_salt = salt;
+  await dbPut(STORES.settings, currentSettings);
+  await auditLog('password_changed');
+  closeModal(); showToast('تغییر کرد. ورود مجدد...', 'success');
+  setTimeout(() => location.reload(), 1500);
+}
+
+function openAppInfo() {
+  showModal('درباره ARTDENT', `
+    <div style="text-align:center;padding:20px;">
+      <div style="font-size:48px;">🦷</div>
+      <h2 style="color:var(--brand);margin:8px 0;">ARTDENT v${APP_VERSION}</h2>
+      <p style="color:var(--text-muted);">سیستم حسابداری لابراتوار دندانسازی</p>
+      <p style="color:#c0392b;font-size:12px;margin-top:6px;">🛡 Security Edition</p>
+      <div style="text-align:right;font-size:12px;line-height:2;margin-top:16px;">
+        <div>✅ سازگار با همه محیط‌ها</div>
+        <div>✅ Storage Adapter (IndexedDB/localStorage/RAM)</div>
+        <div>✅ AES-GCM در محیط‌های امن</div>
+        <div>✅ Fallback هوشمند</div>
+        <div>✅ رمزنگاری فیلدهای حساس</div>
+        <div>✅ گزارش امنیتی برای مدیر</div>
+      </div>
+      <div style="margin-top:20px;font-size:11px;color:var(--text-muted);">
+        <div>شناسه: ${getDeviceId()}</div>
+        <div>سطح امنیت: ${Environment.levelLabel}</div>
+        <div>Storage: ${StorageAdapter.getMode()}</div>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-sm');
+}
+function showPasswordPolicy() {
+  showModal('🔑 سیاست رمز عبور', `
+    <div style="font-size:13px;line-height:2;">
+      <h4 style="color:var(--brand);">قوانین</h4>
+      <div>✅ حداقل ۸ کاراکتر</div>
+      <div>✅ حرف بزرگ (A-Z)</div>
+      <div>✅ حرف کوچک (a-z)</div>
+      <div>✅ رقم (0-9)</div>
+      <hr style="margin:14px 0;">
+      <h4 style="color:var(--brand);">حفاظت</h4>
+      <div>🔒 PBKDF2 با ${toPersianDigits(CryptoVault.getIterations())} تکرار</div>
+      <div>🔒 قفل بعد از ${toPersianDigits(MAX_LOGIN_ATTEMPTS)} تلاش</div>
+      <div>🔒 Auto-Lock ${toPersianDigits(Math.round(IDLE_TIMEOUT/60000))} دقیقه</div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-sm');
+}
+
+function openThemeDialog() {
+  const themes = [
+    { id: 'auto', label: 'خودکار', icon: '📅' }, { id: 'spring', label: 'بهار', icon: '🌸' },
+    { id: 'summer', label: 'تابستان', icon: '☀️' }, { id: 'autumn', label: 'پاییز', icon: '🍂' },
+    { id: 'winter', label: 'زمستان', icon: '❄️' }, { id: 'nowruz', label: 'نوروز', icon: '🎉' },
+    { id: 'yalda', label: 'یلدا', icon: '🍉' }, { id: 'ramadan', label: 'رمضان', icon: '🌙' },
+    { id: 'dark', label: 'شب', icon: '🌙' }
+  ];
+  const current = currentSettings?.auto_theme ? 'auto' : (currentSettings?.manual_theme || 'spring');
+  showModal('🎨 انتخاب تم', `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+      ${themes.map(t => `<button class="btn ${current === t.id ? '' : 'btn-secondary'}" style="padding:16px;flex-direction:column;height:auto;" onclick="selectTheme('${t.id}')">
+        <span style="font-size:28px;">${t.icon}</span><span>${t.label}</span>
+      </button>`).join('')}
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-sm');
+}
+async function selectTheme(id) {
+  if (id === 'auto') { currentSettings.auto_theme = true; await dbPut(STORES.settings, currentSettings); applyAutoTheme(); }
+  else if (id === 'dark') { currentSettings.auto_theme = false; currentSettings.dark_mode = true; currentSettings.manual_theme = 'dark'; await dbPut(STORES.settings, currentSettings); document.body.className = 'theme-dark'; }
+  else { currentSettings.auto_theme = false; currentSettings.dark_mode = false; currentSettings.manual_theme = id; await dbPut(STORES.settings, currentSettings); document.body.className = 'theme-' + id; }
+  closeModal(); showToast('اعمال شد', 'success');
+}
+
+async function openDashboard() {
+  showModal('📊 داشبورد', `
+    <div class="charts-grid">
+      <div class="chart-card"><h3>📊 درآمد ماهانه</h3><div class="chart-container" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;">در دسترس نیست</div></div>
+      <div class="chart-card"><h3>🥇 سهم دندانپزشکان</h3><div class="chart-container" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;">در دسترس نیست</div></div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+async function openReportsDialog() {
+  const services = await dbGetAll(STORES.services);
+  const report = {};
+  services.filter(s => s.is_included).forEach(s => {
+    try {
+      const [gy, gm, gd] = s.service_date.split('-').map(Number);
+      const j = JalaliDate.toJalali(gy, gm, gd);
+      const key = `${j.jy}/${String(j.jm).padStart(2,'0')}`;
+      if (!report[key]) report[key] = { count: 0, total: 0, paid: 0 };
+      report[key].count++;
+      report[key].total += s.total_price || 0;
+      if (s.is_paid) report[key].paid += s.total_price || 0;
+    } catch (e) {}
+  });
+  const rows = Object.entries(report).sort((a, b) => b[0].localeCompare(a[0])).map(([k, v]) => `
+    <tr><td>${toPersianDigits(k)}</td><td>${toPersianDigits(v.count)}</td><td>${formatPrice(v.total)}</td><td style="color:#27ae60;">${formatPrice(v.paid)}</td><td style="color:#c0392b;">${formatPrice(v.total - v.paid)}</td></tr>
+  `).join('');
+  showModal('📈 گزارش‌های ماهانه', `
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>ماه</th><th>تعداد</th><th>جمع</th><th>پرداخت‌شده</th><th>باقی</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="5">خالی</td></tr>'}</tbody>
+    </table></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+
+const QUERY_FIELDS = {
+  patient_name: { label: 'بیمار', type: 'text' },
+  service_name: { label: 'خدمت', type: 'text' },
+  quantity: { label: 'تعداد', type: 'number' },
+  total_price: { label: 'مبلغ', type: 'number' },
+  is_paid: { label: 'پرداخت', type: 'select', options: [{ v: '1', l: 'شده' }, { v: '0', l: 'نشده' }] }
+};
+const OPERATORS = {
+  text: [{ v: 'contains', l: 'شامل' }, { v: 'equals', l: 'برابر' }],
+  number: [{ v: 'eq', l: '=' }, { v: 'gt', l: '>' }, { v: 'lt', l: '<' }],
+  select: [{ v: 'eq', l: 'برابر' }]
+};
+let queryRows = [];
+function openAdvancedQueryBuilder() {
+  queryRows = [{ field: 'patient_name', op: 'contains', value: '' }];
+  renderQueryBuilder();
+  showModal('⚙️ جستجوی پیشرفته', `
+    <div class="query-builder" id="queryBuilder"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="addQueryRow()">➕ افزودن</button>
+      <button class="btn btn-success" onclick="runAdvancedQuery()">🔍 جستجو</button>
+      <button class="btn btn-secondary" onclick="resetQuery()">🔄 پاک</button>
+    </div>
+    <div id="queryResults" style="margin-top:16px;"></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+function renderQueryBuilder() {
+  const c = document.getElementById('queryBuilder'); if (!c) return;
+  c.innerHTML = queryRows.map((row, i) => {
+    const fd = QUERY_FIELDS[row.field];
+    const fo = Object.entries(QUERY_FIELDS).map(([k, v]) => `<option value="${k}" ${row.field === k ? 'selected' : ''}>${v.label}</option>`).join('');
+    const oo = (OPERATORS[fd.type] || []).map(o => `<option value="${o.v}" ${row.op === o.v ? 'selected' : ''}>${o.l}</option>`).join('');
+    let vi = '';
+    if (fd.type === 'select') vi = `<select onchange="updateQueryRow(${i}, 'value', this.value)">${fd.options.map(o => `<option value="${o.v}" ${row.value === o.v ? 'selected' : ''}>${o.l}</option>`).join('')}</select>`;
+    else vi = `<input type="${fd.type === 'number' ? 'number' : 'text'}" value="${escapeHtml(row.value || '')}" onchange="updateQueryRow(${i}, 'value', this.value)" maxlength="100">`;
+    return `<div class="query-row">
+      <select onchange="updateQueryRow(${i}, 'field', this.value)">${fo}</select>
+      <select onchange="updateQueryRow(${i}, 'op', this.value)">${oo}</select>
+      ${vi}
+      <button class="remove-btn" onclick="removeQueryRow(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+function updateQueryRow(i, k, v) {
+  if (k === 'field') { queryRows[i].field = v; queryRows[i].op = (OPERATORS[QUERY_FIELDS[v].type] || [{ v: 'eq' }])[0].v; queryRows[i].value = ''; renderQueryBuilder(); }
+  else queryRows[i][k] = v;
+}
+function addQueryRow() { queryRows.push({ field: 'patient_name', op: 'contains', value: '' }); renderQueryBuilder(); }
+function removeQueryRow(i) { queryRows.splice(i, 1); if (!queryRows.length) queryRows.push({ field: 'patient_name', op: 'contains', value: '' }); renderQueryBuilder(); }
+function resetQuery() { queryRows = [{ field: 'patient_name', op: 'contains', value: '' }]; renderQueryBuilder(); }
+async function runAdvancedQuery() {
+  const all = await buildServicesRowsWithNames();
+  const results = all.filter(r => queryRows.every(row => {
+    if (!row.value && row.value !== '0') return true;
+    const v = r[row.field]; const t = row.value;
+    switch (row.op) {
+      case 'contains': return String(v || '').toLowerCase().includes(String(t).toLowerCase());
+      case 'equals': return String(v || '').toLowerCase() === String(t).toLowerCase();
+      case 'eq': return String(v) === String(t);
+      case 'gt': return parseFloat(v) > parseFloat(t);
+      case 'lt': return parseFloat(v) < parseFloat(t);
+      default: return true;
+    }
+  }));
+  const rowsHTML = results.length === 0 ? '<tr><td colspan="6">نتیجه‌ای نیست</td></tr>' : results.map(r => `<tr><td>${toPersianDigits(r.id)}</td><td>${escapeHtml(r.patient_name)}</td><td>${JalaliDate.isoToJalaliStr(r.service_date)}</td><td>${escapeHtml(r.service_name)}</td><td>${formatPrice(r.total_price)}</td><td>${escapeHtml(r.dentist_name)}</td></tr>`).join('');
+  const total = results.reduce((s, r) => s + (r.total_price || 0), 0);
+  document.getElementById('queryResults').innerHTML = `
+    <div style="margin-bottom:8px;">تعداد: <strong>${toPersianDigits(results.length)}</strong> | جمع: <strong>${formatPrice(total)}</strong></div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>شناسه</th><th>بیمار</th><th>تاریخ</th><th>خدمت</th><th>مبلغ</th><th>دندانپزشک</th></tr></thead><tbody>${rowsHTML}</tbody></table></div>
+  `;
+}
+async function openSearchDialog() {
+  showModal('🔍 جستجو', `
+    <div class="form-group"><label>عبارت</label><input id="simpleSearchInput" maxlength="100"></div>
+    <div id="simpleSearchResults" style="margin-top:14px;"></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+  const input = document.getElementById('simpleSearchInput');
+  input.oninput = debounce(async () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { document.getElementById('simpleSearchResults').innerHTML = ''; return; }
+    const all = await buildServicesRowsWithNames();
+    const rows = all.filter(r => (r.patient_name||'').toLowerCase().includes(q) || (r.service_name||'').toLowerCase().includes(q) || (r.dentist_name||'').toLowerCase().includes(q)).slice(0, 50);
+    document.getElementById('simpleSearchResults').innerHTML = `
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">${toPersianDigits(rows.length)} نتیجه</div>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>شناسه</th><th>بیمار</th><th>تاریخ</th><th>خدمت</th><th>مبلغ</th></tr></thead>
+        <tbody>${rows.map(r => `<tr><td>${toPersianDigits(r.id)}</td><td>${escapeHtml(r.patient_name)}</td><td>${JalaliDate.isoToJalaliStr(r.service_date)}</td><td>${escapeHtml(r.service_name)}</td><td>${formatPrice(r.total_price)}</td></tr>`).join('')}</tbody>
+      </table></div>
+    `;
+  }, 300);
+}
+
+async function printReport() {
+  if (!selectedServiceIds.size) return showToast('ردیفی انتخاب کنید', 'warning');
+  const all = await buildServicesRowsWithNames();
+  const rows = all.filter(r => selectedServiceIds.has(r.id) && r.is_included);
+  if (!rows.length) return showToast('ردیف قابل نمایشی نیست', 'warning');
+  const html = await buildInvoiceHTML(rows, 'RPT-' + Date.now());
+  const w = window.open('', '_blank');
+  if (!w) return showToast('پاپ‌آپ مسدود شده', 'error');
+  w.document.write(`<html dir="rtl"><head><title>چاپ</title><style>${document.querySelector('style').textContent}</style></head><body style="background:white;padding:20px;">${html}</body></html>`);
+  w.document.close(); setTimeout(() => w.print(), 800);
+}
+async function exportReportHTML() {
+  if (!selectedServiceIds.size) return showToast('ردیفی انتخاب کنید', 'warning');
+  const all = await buildServicesRowsWithNames();
+  const rows = all.filter(r => selectedServiceIds.has(r.id) && r.is_included);
+  if (!rows.length) return showToast('ردیف قابل نمایشی نیست', 'warning');
+  const html = await buildInvoiceHTML(rows, 'RPT-' + Date.now());
+  const full = `<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><title>گزارش</title><style>${document.querySelector('style').textContent}</style></head><body style="background:#f4f6f9;padding:20px;">${html}</body></html>`;
+  const blob = new Blob([full], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `report_${Date.now()}.html`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('HTML ذخیره شد', 'success');
+}
+async function buildInvoiceHTML(rows, refCode, note = '', previousDebt = 0) {
+  const appName = currentSettings?.app_name || 'ARTDENT';
+  const labName = currentSettings?.lab_name || 'لابراتوار دندانسازی';
+  const t = JalaliDate.today();
+  const printDate = JalaliDate.format(t.jy, t.jm, t.jd);
+  const total = rows.reduce((s, r) => s + (r.total_price || 0), 0);
+  const grand = total + previousDebt;
+  const rowsHTML = rows.map((r, i) => `<tr><td>${toPersianDigits(i+1)}</td><td>${toPersianDigits(r.id)}</td><td>${escapeHtml(r.patient_name)}</td><td>${JalaliDate.isoToJalaliStr(r.service_date)}</td><td>${escapeHtml(r.service_name)}</td><td>${toPersianDigits(r.quantity)}</td><td>${formatPrice(r.unit_price)}</td><td>${formatPrice(r.total_price)}</td><td>${escapeHtml(r.dentist_name)}</td><td>${escapeHtml(r.clinic_name)}</td></tr>`).join('');
+  return `<div class="invoice-preview">
+    <div class="besmellah">بسمه تعالی</div>
+    <div class="header-box">
+      <div style="text-align:right;"><div style="font-size:16px;font-weight:bold;color:#1a3c5e;">${escapeHtml(appName)}</div><div style="font-size:10px;color:#888;">سیستم حسابداری ${escapeHtml(labName)}</div></div>
+      <div style="text-align:left;"><div>شماره: <strong>${escapeHtml(refCode)}</strong></div><div>تاریخ: ${printDate}</div></div>
+    </div>
+    <table><thead><tr><th>ردیف</th><th>شناسه</th><th>بیمار</th><th>تاریخ</th><th>خدمت</th><th>تعداد</th><th>واحد</th><th>کل</th><th>دندانپزشک</th><th>کلینیک</th></tr></thead><tbody>${rowsHTML}</tbody></table>
+    <div class="total-box"><div>جمع کل قابل پرداخت</div>${previousDebt > 0 ? `<div style="font-size:11px;opacity:0.9;">جمع: ${formatPrice(total)} + بدهی: ${formatPrice(previousDebt)}</div>` : ''}<div class="total-value">${formatPrice(grand)} تومان</div></div>
+    ${note ? `<div class="note">توضیحات: ${escapeHtml(note)}</div>` : ''}
+  </div>`;
+}
+async function generateElegantInvoice() {
+  if (!selectedServiceIds.size) return showToast('ردیفی انتخاب کنید', 'warning');
+  const all = await buildServicesRowsWithNames();
+  const rows = all.filter(r => selectedServiceIds.has(r.id) && r.is_included);
+  if (!rows.length) return showToast('ردیف قابل نمایشی نیست', 'warning');
+  showModal('🧾 فاکتور دیجیتالی', `
+    <div class="form-group"><label>توضیحات</label><textarea id="invNote" rows="2"></textarea></div>
+    <div class="form-group" style="margin-top:10px;"><label>بدهی قبلی</label><input type="text" id="invDebt" placeholder="0" inputmode="numeric"></div>
+    <div style="margin-top:16px;" id="invPreview">${await buildInvoiceHTML(rows, 'INV-' + Date.now())}</div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">انصراف</button><button class="btn" id="invPrintBtn">🖨 چاپ</button>`, 'modal-lg');
+  document.getElementById('invPrintBtn').onclick = async () => {
+    const note = document.getElementById('invNote').value.trim();
+    const debt = parseNumber(document.getElementById('invDebt').value);
+    const html = await buildInvoiceHTML(rows, 'INV-' + Date.now(), note, debt);
+    const w = window.open('', '_blank');
+    if (!w) return showToast('پاپ‌آپ مسدود شده', 'error');
+    w.document.write(`<html dir="rtl"><head><title>فاکتور</title><style>${document.querySelector('style').textContent}</style></head><body style="background:white;padding:20px;">${html}</body></html>`);
+    w.document.close(); setTimeout(() => w.print(), 800);
+  };
+}
+async function openArchiveDialog() {
+  const inv = await dbGetAll(STORES.invoices);
+  const rows = inv.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '')).map(i => `
+    <tr>
+      <td>${escapeHtml(i.name)}</td>
+      <td>${i.created_at ? new Date(i.created_at).toLocaleString('fa-IR') : '-'}</td>
+      <td>
+        <button class="btn btn-sm" onclick="openArchivedInvoice(${i.id})">👁</button>
+        <button class="btn btn-sm btn-success" onclick="downloadArchivedInvoice(${i.id})">💾</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteArchivedInvoice(${i.id})">🗑</button>
+      </td>
+    </tr>`).join('');
+  showModal('📁 بایگانی', `
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>نام</th><th>تاریخ</th><th>عملیات</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="3">خالی</td></tr>'}</tbody>
+    </table></div>
+  `, `<button class="btn btn-secondary" onclick="closeModal()">بستن</button>`, 'modal-lg');
+}
+async function openArchivedInvoice(id) { const i = await dbGet(STORES.invoices, id); if (!i) return; const w = window.open(''); if (!w) return; w.document.write(`<iframe src="${i.pdf_data}" style="width:100%;height:100vh;border:none;"></iframe>`); w.document.close(); }
+async function downloadArchivedInvoice(id) { const i = await dbGet(STORES.invoices, id); if (!i) return; const a = document.createElement('a'); a.href = i.pdf_data; a.download = `${i.name}.pdf`; a.click(); }
+async function deleteArchivedInvoice(id) { const ok = await confirmAsync('حذف شود؟'); if (!ok) return; await dbDelete(STORES.invoices, id); showToast('حذف شد', 'success'); await openArchiveDialog(); }
+
+async function exportAllCSV() {
+  const all = await buildServicesRowsWithNames();
+  const headers = ['شناسه','بیمار','تاریخ','خدمت','تعداد','واحد','کل','دندانپزشک','کلینیک'];
+  const csv = [headers.join(',')].concat(all.map(r => [
+    r.id, r.patient_name, JalaliDate.isoToJalaliStr(r.service_date), r.service_name,
+    r.quantity, r.unit_price, r.total_price, r.dentist_name, r.clinic_name
+  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `artdent_${Date.now()}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV ذخیره شد', 'success');
+}
+
+/* ==================== INIT ==================== */
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await openDatabase();
+    await loadSettings();
+    showLoginScreen();
+    setTimeout(() => {
+      const shield = document.getElementById('shieldStatus');
+      const mode = StorageAdapter.getMode();
+      if (shield) {
+        if (mode === 'indexeddb') shield.textContent = Environment.summary();
+        else if (mode === 'localstorage') shield.textContent = '⚠️ localStorage';
+        else shield.textContent = '⚠️ موقت';
+      }
+    }, 100);
+  } catch (e) {
+    console.error('Startup failed:', e);
+    document.body.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;font-family:Tahoma,sans-serif;direction:rtl;">
+        <div style="font-size:64px;">🦷</div>
+        <h2 style="color:#1a3c5e;">ARTDENT</h2>
+        <p style="color:#c0392b;">خطا در راه‌اندازی: ${escapeHtml(e.message)}</p>
+        <p style="color:#888;font-size:13px;margin-top:20px;">لطفاً از Chrome یا Firefox جدید استفاده کنید.</p>
+      </div>
+    `;
+  }
+});
+
+window.addEventListener('error', e => {
+  console.error(e.error);
+  if (typeof showToast === 'function') showToast('خطا: ' + (e.error?.message || e.message), 'error', 5000);
+});
+window.addEventListener('unhandledrejection', e => {
+  console.error(e.reason);
+  if (typeof showToast === 'function') showToast('خطا: ' + (e.reason?.message || e.reason), 'error', 5000);
+});
+</script>
+</body>
+</html>
